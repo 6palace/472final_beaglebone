@@ -17,5 +17,17 @@ default:
 clean:
 	$(MAKE) -C $(KDIR) SUBDIRS=$(PWD) clean
 
-adcprog: adc.c
-	gcc adc.c -std=gnu99 -g -o adc -lrt
+adcprog: adc.c adc.h
+	arm-linux-gnueabihf-gcc adc.c -std=gnu99 -g -o adc -lrt
+
+moprog: motor.c
+	arm-linux-gnueabihf-gcc motor.c -std=gnu99 -g -o motor -lrt
+
+uploadrun:
+	scp adc root@192.168.3.11:~
+	scp motor root@192.168.3.11:~
+	#scp srmod.ko root@192.168.3.11:~
+	#scp lcdmod.ko root@192.168.3.11:~
+	#scp reloadModule.sh root@192.168.3.11:~
+	#ssh root@192.168.3.11 './reloadModule.sh'
+                      
