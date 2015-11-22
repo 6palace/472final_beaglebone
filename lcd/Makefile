@@ -27,12 +27,15 @@ adcprog: adc.c adc.h
 moprog: motor.c
 	arm-linux-gnueabihf-gcc motor.c -std=gnu99 -g -o motor -lrt
 
-uploadrun:
-	scp adc root@192.168.3.11:~
-	# #scp motor root@192.168.3.11:~
-	# scp srmod.ko root@192.168.3.11:~
-	# scp gpioKern.ko root@192.168.3.11:~
-	# # scp lcdmod.ko root@192.168.3.11:~
-	# scp reloadModule.sh root@192.168.3.11:~
-	# ssh root@192.168.3.11 './reloadModule.sh'
+lcdprog: lcdsr_uspace.c lcdsr_uspace.h
+	arm-linux-gnueabihf-gcc lcdsr_uspace.c -std=gnu99 -g -o lcdsr_uspace -lrt
+
+uploadlkm:
+	#scp adc root@192.168.3.11:~
+	#scp motor root@192.168.3.11:~
+	scp srmod.ko root@192.168.3.11:~
+	scp gpioKern.ko root@192.168.3.11:~
+	scp lcdmod.ko root@192.168.3.11:~
+	scp reloadModule.sh root@192.168.3.11:~
+	ssh root@192.168.3.11 './reloadModule.sh'
                       

@@ -1,5 +1,5 @@
 /*
- * GPIO INTERRUPT
+ * GPIO INTERRUPT, based on given code
  *
  */
 #include <linux/init.h>
@@ -7,6 +7,8 @@
 #include <linux/kernel.h>
 #include <linux/gpio.h>                 // Required for the GPIO functions
 #include <linux/interrupt.h>            // Required for the IRQ code
+#include <linux/kfifo.h>
+
 
 MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("A Button/LED test driver for the BBB");
@@ -30,6 +32,9 @@ static irq_handler_t  ebbgpio_irq_handler(unsigned int irq, void *dev_id, struct
  */
 static int __init ebbgpio_init(void){
    int result = 0;
+
+   // mkfifo("/tmp/button_status", 0666);
+
    printk(KERN_INFO "GPIO_TEST: Initializing the GPIO_TEST LKM\n");
    // Is the GPIO a valid GPIO number (e.g., the BBB has 4x32 but not all available)
    if (!gpio_is_valid(gpioLED)){
@@ -64,6 +69,8 @@ static int __init ebbgpio_init(void){
 
    printk(KERN_INFO "GPIO_TEST: The interrupt request result is: %d\n", result);
    return result;
+
+
 }
 
 /** @brief The LKM cleanup function
@@ -96,6 +103,7 @@ static void __exit ebbgpio_exit(void){
 static irq_handler_t ebbgpio_irq_handler(unsigned int irq, void *dev_id, struct pt_regs *regs) {
    ledOn = !ledOn;                          // Invert the LED state on each button press
    gpio_set_value(gpioLED, ledOn);          // Set the physical LED accordingly
+
    printk(KERN_INFO "GPIO_TEST: Interrupt! (button state is %d)\n", gpio_get_value(gpioButton));
    numberPresses++;                         // Global counter, will be outputted when the module is unloaded
    return (irq_handler_t) IRQ_HANDLED;      // Announce that the IRQ has been handled correctly

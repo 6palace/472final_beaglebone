@@ -3,10 +3,13 @@
 #include "adc.h"
 
 int main() {
-	printf("ADC Value 4: %d\n", readADC(4));
-	printf("ADC Value 5: %d\n", readADC(5));
-	printf("ADC Value 6: %d\n", readADC(6));
-	printf("ADC Value 7: %d\n", readADC(7));
+	while(1) {
+		printf("ADC Value 4: %d\n", readADC(4));
+		printf("ADC Value 5: %d\n", readADC(5));
+		printf("ADC Value 6: %d\n", readADC(6));
+		printf("ADC Value 7: %d\n", readADC(7));
+		usleep(1000000);
+	}
 	return 0;
 }
 
