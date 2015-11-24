@@ -15,3 +15,4 @@ void setGPIO(FILE* loc, int toSet);
 FILE* initGPIO(int gpioNum);
 pwmAttr initPWM(int chipNum, int subID);
 void motorSpeed(pwmAttr pwm, int percent);
+void setMotor(int whichMotor, int direction, int percent);

@@ -29,7 +29,7 @@ moprog: motor.c
 
 uploadrun:
 	scp adc root@192.168.3.11:~
-	# #scp motor root@192.168.3.11:~
+	scp motor root@192.168.3.11:~
 	# scp srmod.ko root@192.168.3.11:~
 	# scp gpioKern.ko root@192.168.3.11:~
 	# # scp lcdmod.ko root@192.168.3.11:~

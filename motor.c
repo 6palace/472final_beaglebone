@@ -14,38 +14,83 @@
 #define CHIP_PWMB 4
 #define ID_PWMB 0
 
+//Directions
+#define OFF 0
+#define FORWARD 1
+#define BACKWARD 2
+#define BRAKE 3
+
+//MOTORS
+#define M_RIGHT 0
+#define M_LEFT 1
+
+
+FILE* ain1;
+FILE* ain2;
+FILE* bin1;
+FILE* bin2;
+pwmAttr pwmA;
+pwmAttr pwmB;
 
 int main() {
-	FILE* ain1 = initGPIO(GPIO_AIN1);
-	FILE* ain2 = initGPIO(GPIO_AIN2);
-	FILE* bin1 = initGPIO(GPIO_BIN1);
-	FILE* bin2 = initGPIO(GPIO_BIN2);
-	pwmAttr pwmA = initPWM(CHIP_PWMA, ID_PWMA);
-	pwmAttr pwmB = initPWM(CHIP_PWMB, ID_PWMB);
+	ain1 = initGPIO(GPIO_AIN1);
+	ain2 = initGPIO(GPIO_AIN2);
+	bin1 = initGPIO(GPIO_BIN1);
+	bin2 = initGPIO(GPIO_BIN2);
+	pwmA = initPWM(CHIP_PWMA, ID_PWMA);
+	pwmB = initPWM(CHIP_PWMB, ID_PWMB);
 	fprintf(pwmA.enable, "%s", "1");
 	fprintf(pwmB.enable, "%s", "1");
 
-	motorSpeed(pwmA, 100);
-	motorSpeed(pwmB, 100);
-
-	//FORWARD
-	setGPIO(ain1, 0);
-	setGPIO(ain2, 1);
-
-	setGPIO(bin1, 0);
-	setGPIO(bin2, 1);
-
+	setMotor(M_RIGHT, FORWARD, 100);
 	sleep(1);
-
-	//off
-	setGPIO(ain1, 0);
-	setGPIO(ain2, 0);
-
-	setGPIO(bin1, 0);
-	setGPIO(bin2, 0);
+	setMotor(M_RIGHT, OFF, 100);
+	sleep(1);
+	setMotor(M_LEFT, FORWARD, 100);
+	sleep(1);
+	setMotor(M_LEFT, OFF, 100);
 
 	return 0;
 }
+
+void setMotor(int whichMotor, int direction, int percent) {
+	
+	FILE* in1;
+	FILE* in2;
+	pwmAttr pwm;
+
+	if(whichMotor == M_RIGHT) {
+		in1 = ain1;
+		in2 = ain2;
+		pwm = pwmA;
+	} else {		
+		in1 = bin1;
+		in2 = bin2;
+		pwm = pwmB;
+	}
+
+	switch(direction){
+		case OFF:
+			setGPIO(in1, 0);
+			setGPIO(in2, 0);
+			break;
+		case FORWARD:
+			setGPIO(in1, 0);
+			setGPIO(in2, 1);
+			break;
+		case BACKWARD:
+			setGPIO(in1, 1);
+			setGPIO(in2, 0);
+			break;
+		case BRAKE:
+			setGPIO(in1, 1);
+			setGPIO(in2, 1);
+			break;
+	}
+
+	motorSpeed(pwm, percent);
+}
+
 
 void motorSpeed(pwmAttr pwm, int percent) {
 	int period = 100;
