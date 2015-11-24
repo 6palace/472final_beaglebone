@@ -24,6 +24,7 @@ int main() {
 		//fprintf(adc7, "ADC Value 7: %d\n", readADC(7));
 		//printf("sent\n");
 		//usleep(1000000);
+		fflush(adc4);
 		sleep(1);
 
 	}
