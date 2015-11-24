@@ -9,6 +9,7 @@ obj-m := gpioKern.o srmod.o lcdmod.o
 
 srmod-objs := shiftReg.o mainMod_sr.o
 lcdmod-objs := lcd_sr.o mainMod_lcd.o
+gpioKern-objs := interrupt.o
 export-objs := shiftReg.o mainMod_sr.o
 
 # Kernel source directory
@@ -21,6 +22,11 @@ default:
 clean:
 	$(MAKE) -C $(KDIR) SUBDIRS=$(PWD) clean
 
+doall: default mainprog adcprog moprog uploadrun
+
+mainprog: main.c
+	arm-linux-gnueabihf-gcc main.c -std=gnu99 -g -o control -lrt
+
 adcprog: adc.c adc.h
 	arm-linux-gnueabihf-gcc adc.c -std=gnu99 -g -o adc -lrt
 
@@ -30,9 +36,9 @@ moprog: motor.c
 uploadrun:
 	scp adc root@192.168.3.11:~
 	scp motor root@192.168.3.11:~
-	# scp srmod.ko root@192.168.3.11:~
-	# scp gpioKern.ko root@192.168.3.11:~
-	# # scp lcdmod.ko root@192.168.3.11:~
-	# scp reloadModule.sh root@192.168.3.11:~
-	# ssh root@192.168.3.11 './reloadModule.sh'
+	scp control root@192.168.3.11:~
+	scp *.ko root@192.168.3.11:~
+	scp reloadModule.sh root@192.168.3.11:~
+	ssh root@192.168.3.11 './reloadModule.sh'
+	#ssh root@192.168.3.11 './control'
                       
