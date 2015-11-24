@@ -50,6 +50,11 @@ int main() {
 	sleep(1);
 	setMotor(M_LEFT, OFF, 100);
 
+	fclose(ain1);
+	fclose(ain2);
+	fclose(bin1);
+	fclose(bin2);
+
 	return 0;
 }
 

@@ -33,6 +33,9 @@ adcprog: adc.c adc.h
 moprog: motor.c
 	arm-linux-gnueabihf-gcc motor.c -std=gnu99 -g -o motor -lrt
 
+butprog: interrupt_test.c
+	arm-linux-gnueabihf-gcc interrupt_test.c -std=gnu99 -g -o interrupt_test -lrt
+
 uploadrun:
 	#scp adc root@192.168.3.11:~
 	#scp motor root@192.168.3.11:~
@@ -41,4 +44,10 @@ uploadrun:
 	scp reloadModule.sh root@192.168.3.11:~
 	ssh root@192.168.3.11 './reloadModule.sh'
 	#ssh root@192.168.3.11 './control'
-                      
+     
+uploaduser:
+	scp adc root@192.168.3.11:~
+	scp motor root@192.168.3.11:~
+	scp control root@192.168.3.11:~
+	scp interrupt_test root@192.168.3.11:~
+	# ssh root@192.168.3.11 './adc'
