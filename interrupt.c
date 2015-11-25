@@ -1,154 +1,116 @@
-/*
- * GPIO INTERRUPT
- *
- */
-#include <linux/init.h>
-#include <linux/module.h>
-#include <linux/kernel.h>
-#include <linux/fs.h>
-#include <linux/gpio.h>                 // Required for the GPIO functions
-#include <linux/interrupt.h>            // Required for the IRQ code
-#include <asm/siginfo.h>   //siginfo
-#include <linux/rcupdate.h>   //rcu_read_lock
-#include <linux/sched.h>   //find_task_by_pid_type
-#include <linux/cdev.h>
-#include <linux/semaphore.h>
-#include <linux/device.h> 
-#include <asm/uaccess.h>
+//interrupt.c
+//EE 472 Group F
 
- #define SIG_TEST 44
-#define DEVICE_NAME "buttons_char"
-#define CLASS_NAME "gpio_button_sig"
+#include "interrupt.h"
 
-/* data structures */
-// contains data about the device.
-struct device_info {
-   struct semaphore sem;
-} virtual_device;
-
-static ssize_t write_pid(struct file *file, const char __user *buf,
-                                size_t count, loff_t *ppos);
-int device_open(struct inode *inode, struct file* filp);
-ssize_t device_read(struct file* filp, char* bufStoreData, 
-   size_t bufLength, loff_t* curOffset);
-
-int device_close(struct inode* inode, struct  file *filp);
-static const struct file_operations fops = {
-   .owner = THIS_MODULE,
-   .write = write_pid,
-   .open = device_open,
-   .read = device_read,
-   .release = device_close
-};
-
-/* global variables */
-// stores info about this char device.
-static struct cdev* mcdev;
-// holds major and minor number granted by the kernel
-static dev_t dev_num;
-// class of module for registration
-static struct class *modclass; 
-
-MODULE_LICENSE("GPL");
-MODULE_DESCRIPTION("A Button/LED test driver for the BBB");
-MODULE_VERSION("0.1");
-
-static unsigned int gpioButtons[] = {20, 75, 106};   ///< hard coding the button gpios
-//75 points to empty gpio, since button1 shares output with pwm and can no longer be accessed
-static unsigned int irqNumber[3];          ///< Used to share the IRQ number within this file
+//static unsigned int gpioLED = 74;       ///< hard coding the LED gpio for this example to P9_23 (GPIO49)
+static unsigned int gpioButton = 20;   ///< hard coding the button gpio for this example to P9_27 (GPIO115)
+static unsigned int gpioButton2 = 106;   ///< hard coding the button gpio for this example to P9_27 (GPIO115)
+static unsigned int irqNumber;          ///< Used to share the IRQ number within this file
+static unsigned int irqNumber2;          ///< Used to share the IRQ number within this file
 static unsigned int numberPresses = 0;  ///< For information, store the number of button presses
-static int attachedPID;
+static bool     ledOn = 0;          ///< Is the LED on or off? Used to invert its state (off by default)
 
-/// Function prototype for the custom IRQ handler function -- see below for the implementation
-static irq_handler_t  ebbgpio_irq_handler(unsigned int irq, void *dev_id, struct pt_regs *regs);
-
-/** @brief The LKM initialization function
- *  The static keyword restricts the visibility of the function to within this C file. The __init
- *  macro means that for a built-in driver (not a LKM) the function is only used at initialization
- *  time and that it can be discarded and its memory freed up after that point. In this example this
- *  function sets up the GPIOs and the IRQ
- *  @return returns 0 if successful
- */
-static int __init ebbgpio_init(void){
-   int result = 0;
-   //TODO create device file that user sends their pid to
+static int __init driver_entry(void) {
+   int ret, result, result2;
+   //Make a device class
    modclass = class_create(THIS_MODULE, CLASS_NAME);
-   result |= alloc_chrdev_region(&dev_num, 0, 1, DEVICE_NAME);
-   if (result < 0) {
+
+   //Get major and minor number for device
+   ret = alloc_chrdev_region(&dev_num, 0, 1, DEVICE_NAME);
+   if (ret < 0) {
       printk(KERN_ALERT DEVICE_NAME": Failed to allocate a major number\n");
-      return result;
+      return ret;
    }
-   printk(KERN_ALERT DEVICE_NAME": device major number inited\n");
+
    //Initialize cdev
    mcdev = cdev_alloc();
    mcdev->ops = &fops;
    mcdev->owner = THIS_MODULE;
 
+   //Add character device to filesystem
+   ret = cdev_add(mcdev, dev_num, 1);
+   if (ret < 0) {
+      printk(KERN_ALERT DEVICE_NAME": unable to add cdev to kernel\n");
+      return ret;
+   }
 
    device_create(modclass, NULL, dev_num, NULL, DEVICE_NAME);
 
+   printk(KERN_INFO DEVICE_NAME": Created\n");
+
+   // Initialize SEMAPHORE
    sema_init(&virtual_device.sem, 1);
 
+   result = 0;
+   result2 = 0;
    printk(KERN_INFO "GPIO_TEST: Initializing the GPIO_TEST LKM\n");
-
-   //initializing gpios
-   for(int i = 0; i < 3; i++){
-      gpio_request(gpioButtons[i], "sysfs");       // Set up the gpioButton
-      gpio_direction_input(gpioButtons[i]);        // Set the button GPIO to be an input
-      gpio_set_debounce(gpioButtons[i], 200);      // Debounce the button with a delay of 200ms
-      gpio_export(gpioButtons[i], false);          // Causes gpio115 to appear in /sys/class/gpio
+   // Is the GPIO a valid GPIO number (e.g., the BBB has 4x32 but not all available)
+  /* if (!gpio_is_valid(gpioLED)){
+      printk(KERN_INFO "GPIO_TEST: invalid LED GPIO\n");
+      return -ENODEV;
+   }*/
+   // Going to set up the LED. It is a GPIO in output mode and will be on by default
+  // ledOn = false;
+  // gpio_request(gpioLED, "sysfs");          // gpioLED is hardcoded to 49, request it
+  // gpio_direction_output(gpioLED, ledOn);   // Set the gpio to be in output mode and on
+// gpio_set_value(gpioLED, ledOn);          // Not required as set by line above (here for reference)
+  // gpio_export(gpioLED, false);             // Causes gpio49 to appear in /sys/class/gpio
                              // the bool argument prevents the direction from being changed
-      // Perform a quick test to see that the button is working as expected on LKM load
-      printk(KERN_INFO "GPIO_TEST: The button %d state is currently: %d\n", i, gpio_get_value(gpioButtons[i]));
+   gpio_request(gpioButton, "sysfs");       // Set up the gpioButton
+   gpio_direction_input(gpioButton);        // Set the button GPIO to be an input
+   gpio_set_debounce(gpioButton, 200);      // Debounce the button with a delay of 200ms
+   gpio_export(gpioButton, false);          // Causes gpio115 to appear in /sys/class/gpio  
+   gpio_request(gpioButton2, "sysfs");       // Set up the gpioButton
+   gpio_direction_input(gpioButton2);        // Set the button GPIO to be an input
+   gpio_set_debounce(gpioButton2, 200);      // Debounce the button with a delay of 200ms
+   gpio_export(gpioButton2, false);          // Causes gpio115 to appear in /sys/class/gpio
+                             // the bool argument prevents the direction from being changed
+   // Perform a quick test to see that the button is working as expected on LKM load
+   printk(KERN_INFO "GPIO_TEST: The button state is currently: %d\n", gpio_get_value(gpioButton));
 
-      // GPIO numbers and IRQ numbers are not the same! This function performs the mapping for us
-      irqNumber[i] = gpio_to_irq(gpioButtons[i]);
-      printk(KERN_INFO "GPIO_TEST: The button %d is mapped to IRQ: %u\n", i, irqNumber[i]);
-      // This next call requests an interrupt line
-      result |= request_irq(irqNumber[i],             // The interrupt number requested
-                           (irq_handler_t) ebbgpio_irq_handler, // The pointer to the handler function below
-                           IRQF_TRIGGER_RISING,   // Interrupt on rising edge (button press, not release)
-                           "ebb_gpio_handler",    // Used in /proc/interrupts to identify the owner
-                           NULL);                 // The *dev_id for shared interrupt lines, NULL is okay
-   }
+   // GPIO numbers and IRQ numbers are not the same! This function performs the mapping for us
+   irqNumber = gpio_to_irq(gpioButton);
+   irqNumber2 = gpio_to_irq(gpioButton2);
 
+   printk(KERN_INFO "GPIO_TEST: The button is mapped to IRQ: %d\n", irqNumber);
 
+   // This next call requests an interrupt line
+   result = request_irq(irqNumber,             // The interrupt number requested
+                        (irq_handler_t) ebbgpio_irq_handler, // The pointer to the handler function below
+                        IRQF_TRIGGER_RISING,   // Interrupt on rising edge (button press, not release)
+                        "ebb_gpio_handler",    // Used in /proc/interrupts to identify the owner
+                        NULL);                 // The *dev_id for shared interrupt lines, NULL is okay   
+   result2 = request_irq(irqNumber2,             // The interrupt number requested
+                        (irq_handler_t) ebbgpio_irq_handler, // The pointer to the handler function below
+                        IRQF_TRIGGER_RISING,   // Interrupt on rising edge (button press, not release)
+                        "ebb_gpio_handler",    // Used in /proc/interrupts to identify the owner
+                        NULL);                 // The *dev_id for shared interrupt lines, NULL is okay
 
    printk(KERN_INFO "GPIO_TEST: The interrupt request result is: %d\n", result);
-   return result;
+
+   return 0;
 }
 
-/** @brief The LKM cleanup function
- *  Similar to the initialization function, it is static. The __exit macro notifies that if this
- *  code is used for a built-in driver (not a LKM) that this function is not required. Used to release the
- *  GPIOs and display cleanup messages.
- */
-static void __exit ebbgpio_exit(void){
-   //printk(KERN_INFO "GPIO_TEST: The button state is currently: %d\n", gpio_get_value(gpioButton));
-   printk(KERN_INFO "GPIO_TEST: Buttons were pressed %d times\n", numberPresses);
-   for(int i = 0; i < 3; i++){
-      free_irq(irqNumber[i], NULL);               // Free the IRQ number, no *dev_id required in this case
-      gpio_unexport(gpioButtons[i]);               // Unexport the Button GPIO
-      gpio_free(gpioButtons[i]);                   // Free the Button GPIO
-   }
-   
+static void __exit driver_exit(void) {
+   printk(KERN_INFO "GPIO_TEST: The button state is currently: %d\n", gpio_get_value(gpioButton));
+   printk(KERN_INFO "GPIO_TEST: The button was pressed %d times\n", numberPresses);
+  // gpio_set_value(gpioLED, 0);              // Turn the LED off, makes it clear the device was unloaded
+  // gpio_unexport(gpioLED);                  // Unexport the LED GPIO
+   free_irq(irqNumber, NULL);               // Free the IRQ number, no *dev_id required in this case
+   free_irq(irqNumber2, NULL);               // Free the IRQ number, no *dev_id required in this case
+   gpio_unexport(gpioButton);               // Unexport the Button GPIO
+   gpio_unexport(gpioButton2);               // Unexport the Button GPIO
+  // gpio_free(gpioLED);                      // Free the LED GPIO
+   gpio_free(gpioButton);                   // Free the Button GPIO
+   gpio_free(gpioButton2);                   // Free the Button GPIO
    printk(KERN_INFO "GPIO_TEST: Goodbye from the LKM!\n");
-}
 
-//requires a getpid() written from test program to kernel module
-static ssize_t write_pid(struct file *file, const char __user *buf,
-                                size_t count, loff_t *ppos){
-   char mybuf[10];
-   ssize_t res;
-
-   /* read the value from user space */
-   if(count > 10)
-      return -EINVAL;
-   res = copy_from_user(mybuf, buf, count);
-   sscanf(mybuf, "%d", &attachedPID);
-   printk("pid = %d\n", attachedPID);
-
-   return count;
+   cdev_del(mcdev);
+   unregister_chrdev_region(dev_num, 1);
+   device_destroy(modclass, dev_num);
+   class_destroy(modclass);
+   printk(KERN_ALERT DEVICE_NAME": successfully unloaded\n");
 }
 
 int device_open(struct inode *inode, struct file* filp) {
@@ -160,64 +122,55 @@ int device_open(struct inode *inode, struct file* filp) {
    return 0;
 }
 
-
-ssize_t device_read(struct file* filp, char* bufStoreData, 
-   size_t bufLength, loff_t* curOffset) {
-   return 0;
-}
-
 int device_close(struct inode* inode, struct  file *filp) {
    up(&virtual_device.sem);
    printk(KERN_INFO DEVICE_NAME": closing device\n");
    return 0;   
 }
-/** @brief The GPIO IRQ Handler function
- *  This function is a custom interrupt handler that is attached to the GPIO above. The same interrupt
- *  handler cannot be invoked concurrently as the interrupt line is masked out until the function is complete.
- *  This function is static as it should not be invoked directly from outside of this file.
- *  @param irq    the IRQ number that is associated with the GPIO -- useful for logging.
- *  @param dev_id the *dev_id that is provided -- can be used to identify which device caused the interrupt
- *  Not used in this example as NULL is passed.
- *  @param regs   h/w specific register values -- only really ever used for debugging.
- *  return returns IRQ_HANDLED if successful -- should return IRQ_NONE otherwise.
- */
+
 static irq_handler_t ebbgpio_irq_handler(unsigned int irq, void *dev_id, struct pt_regs *regs) {
-   int selectedButton = -1;
-   struct siginfo info;
-   struct task_struct *t;
+  // ledOn = !ledOn;                          // Invert the LED state on each button press
+  // gpio_set_value(gpioLED, ledOn);          // Set the physical LED accordingly
+   printk(KERN_INFO "GPIO_TEST: Interrupt! (button state is %d)\n", gpio_get_value(gpioButton));
+   //numberPresses++;
+   printk("LOOK: %d\n", irq);
 
-   for(int i = 0; i < 3; i++){
-      if(irq == irqNumber[i]){
-         selectedButton = i;
-         break;
-      }
-   }
-   if(selectedButton > -1){
-      printk(KERN_INFO "GPIO_TEST: Interrupt! (gpio %d is %d)\n", selectedButton, gpio_get_value(gpioButtons[selectedButton]));
-   }
-   numberPresses++;                         // Global counter, will be outputted when the module is unloaded
+   virtual_device.button = (irq == irqNumber);
 
-
-   memset(&info, 0, sizeof(struct siginfo));
-   info.si_signo = SIG_TEST;
-   info.si_code = SI_QUEUE; //possibly change to SI_QUEUE
-   info.si_int = selectedButton;        //real time signals may have 32 bits of data.
-
-   rcu_read_lock();
-   t = pid_task(find_pid_ns(attachedPID, &init_pid_ns), PIDTYPE_PID);
-   if(t == NULL){
-      printk("no such pid\n");
-      rcu_read_unlock();
-      return (irq_handler_t) IRQ_HANDLED;
-   }  
-   rcu_read_unlock();
-
-
-   send_sig_info(SIG_TEST, &info, t);
+   virtual_device.interruptWaiting = 1;
    return (irq_handler_t) IRQ_HANDLED;      // Announce that the IRQ has been handled correctly
 }
 
-/// This next calls are  mandatory -- they identify the initialization function
-/// and the cleanup function (as above).
-module_init(ebbgpio_init);
-module_exit(ebbgpio_exit);
+//MODIFY HERE
+ssize_t device_read(struct file* filp, char* bufStoreData, 
+   size_t bufLength, loff_t* curOffset) {
+   int ret;
+   /*int ret;
+   char funStr[] = "NOTE: check LCD fluid.\n";
+   if(*curOffset > 0) return 0; //Don't read past the end of the file.
+   ret = copy_to_user(bufStoreData, funStr, strlen(funStr));
+   *curOffset += strlen(funStr);
+   return strlen(funStr);*/
+   char* buttonStr ;
+   if (virtual_device.button)
+      buttonStr = "1\n";
+   else
+      buttonStr = "0\n";
+   if (virtual_device.interruptWaiting) {
+      ret = copy_to_user(bufStoreData, buttonStr, strlen(buttonStr));
+      virtual_device.interruptWaiting = 0;
+      return strlen(buttonStr);
+      //return 0;
+   }
+   return 1;
+}
+
+ssize_t device_write(struct file* filp, const char* bufSource,
+   size_t bufLength, loff_t* curOffset) {
+   printk(KERN_INFO DEVICE_NAME": Not Implemented\n");
+   return bufLength;
+}
+
+MODULE_LICENSE("GPL"); // module license: required to use some functionalities.
+module_init(driver_entry); // declares which function runs on init.
+module_exit(driver_exit);  // declares which function runs on exit.

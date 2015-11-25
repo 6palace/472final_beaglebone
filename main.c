@@ -36,14 +36,18 @@ int main() {
 	struct pollfd pfd[NUMPOLL];
 	int ret;
 	ssize_t bytes;
-	int fd;
+	int fd, fd2;
 	char* tok;
 
-	fd = open("/tmp/adcData", O_RDONLY);
+	//fd = open("/tmp/adcData", O_RDONLY);
+	fd = open("/dev/ib", O_RDONLY); //fd2
 
 	pfd[0].fd = fd;
 	//pfd[0].events = POLLIN | POLLERR | POLLHUP;
 	pfd[0].events = POLLIN;
+	//pfd[1].fd = fd2;
+	//pfd[0].events = POLLIN | POLLERR | POLLHUP;
+	//pfd[1].events = POLLIN;
 
 	char databuf[1024] = "";
 

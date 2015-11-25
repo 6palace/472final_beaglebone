@@ -1,0 +1,9 @@
+Things that need to get done
+============================
+
+* interrupt.c
+	Block the char driver (while loops?)
+
+* Main
+	integrate buttons
+	Motor Demo?

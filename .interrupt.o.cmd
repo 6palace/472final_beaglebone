@@ -3,21 +3,24 @@ cmd_/home/station02/Lab3/interrupt.o := arm-linux-gnueabihf-gcc -Wp,-MD,/home/st
 source_/home/station02/Lab3/interrupt.o := /home/station02/Lab3/interrupt.c
 
 deps_/home/station02/Lab3/interrupt.o := \
-  include/linux/init.h \
-    $(wildcard include/config/broken/rodata.h) \
+  /home/station02/Lab3/interrupt.h \
+  include/linux/module.h \
+    $(wildcard include/config/sysfs.h) \
     $(wildcard include/config/modules.h) \
-  include/linux/compiler.h \
-    $(wildcard include/config/sparse/rcu/pointer.h) \
-    $(wildcard include/config/trace/branch/profiling.h) \
-    $(wildcard include/config/profile/all/branches.h) \
-    $(wildcard include/config/enable/must/check.h) \
-    $(wildcard include/config/enable/warn/deprecated.h) \
-    $(wildcard include/config/kprobes.h) \
-  include/linux/compiler-gcc.h \
-    $(wildcard include/config/arch/supports/optimized/inlining.h) \
-    $(wildcard include/config/optimize/inlining.h) \
-  include/linux/compiler-gcc4.h \
-    $(wildcard include/config/arch/use/builtin/bswap.h) \
+    $(wildcard include/config/unused/symbols.h) \
+    $(wildcard include/config/module/sig.h) \
+    $(wildcard include/config/generic/bug.h) \
+    $(wildcard include/config/kallsyms.h) \
+    $(wildcard include/config/smp.h) \
+    $(wildcard include/config/tracepoints.h) \
+    $(wildcard include/config/tracing.h) \
+    $(wildcard include/config/event/tracing.h) \
+    $(wildcard include/config/ftrace/mcount/record.h) \
+    $(wildcard include/config/module/unload.h) \
+    $(wildcard include/config/constructors.h) \
+    $(wildcard include/config/debug/set/module/ronx.h) \
+  include/linux/list.h \
+    $(wildcard include/config/debug/list.h) \
   include/linux/types.h \
     $(wildcard include/config/uid16.h) \
     $(wildcard include/config/lbdaf.h) \
@@ -34,24 +37,20 @@ deps_/home/station02/Lab3/interrupt.o := \
   /opt/PHYTEC_BSPs/yocto_ti/build/tmp-glibc/work/phyboard_wega_am335x_1-phytec-linux-gnueabi/linux-ti/3.12.30-phy2-r0/git/include/uapi/linux/posix_types.h \
   include/linux/stddef.h \
   include/uapi/linux/stddef.h \
+  include/linux/compiler.h \
+    $(wildcard include/config/sparse/rcu/pointer.h) \
+    $(wildcard include/config/trace/branch/profiling.h) \
+    $(wildcard include/config/profile/all/branches.h) \
+    $(wildcard include/config/enable/must/check.h) \
+    $(wildcard include/config/enable/warn/deprecated.h) \
+    $(wildcard include/config/kprobes.h) \
+  include/linux/compiler-gcc.h \
+    $(wildcard include/config/arch/supports/optimized/inlining.h) \
+    $(wildcard include/config/optimize/inlining.h) \
+  include/linux/compiler-gcc4.h \
+    $(wildcard include/config/arch/use/builtin/bswap.h) \
   /opt/PHYTEC_BSPs/yocto_ti/build/tmp-glibc/work/phyboard_wega_am335x_1-phytec-linux-gnueabi/linux-ti/3.12.30-phy2-r0/git/arch/arm/include/uapi/asm/posix_types.h \
   /opt/PHYTEC_BSPs/yocto_ti/build/tmp-glibc/work/phyboard_wega_am335x_1-phytec-linux-gnueabi/linux-ti/3.12.30-phy2-r0/git/include/uapi/asm-generic/posix_types.h \
-  include/linux/module.h \
-    $(wildcard include/config/sysfs.h) \
-    $(wildcard include/config/unused/symbols.h) \
-    $(wildcard include/config/module/sig.h) \
-    $(wildcard include/config/generic/bug.h) \
-    $(wildcard include/config/kallsyms.h) \
-    $(wildcard include/config/smp.h) \
-    $(wildcard include/config/tracepoints.h) \
-    $(wildcard include/config/tracing.h) \
-    $(wildcard include/config/event/tracing.h) \
-    $(wildcard include/config/ftrace/mcount/record.h) \
-    $(wildcard include/config/module/unload.h) \
-    $(wildcard include/config/constructors.h) \
-    $(wildcard include/config/debug/set/module/ronx.h) \
-  include/linux/list.h \
-    $(wildcard include/config/debug/list.h) \
   include/linux/poison.h \
     $(wildcard include/config/illegal/pointer/value.h) \
   /opt/PHYTEC_BSPs/yocto_ti/build/tmp-glibc/work/phyboard_wega_am335x_1-phytec-linux-gnueabi/linux-ti/3.12.30-phy2-r0/git/include/uapi/linux/const.h \
@@ -114,6 +113,8 @@ deps_/home/station02/Lab3/interrupt.o := \
     $(wildcard include/config/early/printk.h) \
     $(wildcard include/config/printk.h) \
     $(wildcard include/config/dynamic/debug.h) \
+  include/linux/init.h \
+    $(wildcard include/config/broken/rodata.h) \
   include/linux/kern_levels.h \
   include/linux/dynamic_debug.h \
   include/linux/string.h \
@@ -479,6 +480,33 @@ deps_/home/station02/Lab3/interrupt.o := \
   /opt/PHYTEC_BSPs/yocto_ti/build/tmp-glibc/work/phyboard_wega_am335x_1-phytec-linux-gnueabi/linux-ti/3.12.30-phy2-r0/git/arch/arm/include/uapi/asm/fcntl.h \
   /opt/PHYTEC_BSPs/yocto_ti/build/tmp-glibc/work/phyboard_wega_am335x_1-phytec-linux-gnueabi/linux-ti/3.12.30-phy2-r0/git/include/uapi/asm-generic/fcntl.h \
   include/linux/err.h \
+  include/linux/cdev.h \
+  include/linux/device.h \
+    $(wildcard include/config/debug/devres.h) \
+    $(wildcard include/config/acpi.h) \
+    $(wildcard include/config/pinctrl.h) \
+    $(wildcard include/config/dma/cma.h) \
+    $(wildcard include/config/devtmpfs.h) \
+    $(wildcard include/config/sysfs/deprecated.h) \
+  include/linux/ioport.h \
+  include/linux/klist.h \
+  include/linux/pinctrl/devinfo.h \
+    $(wildcard include/config/pm.h) \
+  include/linux/pinctrl/consumer.h \
+  include/linux/seq_file.h \
+  include/linux/pinctrl/pinctrl-state.h \
+  include/linux/pm.h \
+    $(wildcard include/config/vt/console/sleep.h) \
+    $(wildcard include/config/pm/runtime.h) \
+    $(wildcard include/config/pm/clk.h) \
+    $(wildcard include/config/pm/generic/domains.h) \
+  include/linux/ratelimit.h \
+  /opt/PHYTEC_BSPs/yocto_ti/build/tmp-glibc/work/phyboard_wega_am335x_1-phytec-linux-gnueabi/linux-ti/3.12.30-phy2-r0/git/arch/arm/include/asm/device.h \
+    $(wildcard include/config/dmabounce.h) \
+    $(wildcard include/config/iommu/api.h) \
+    $(wildcard include/config/arm/dma/use/iommu.h) \
+    $(wildcard include/config/arch/omap.h) \
+  include/linux/pm_wakeup.h \
   include/linux/gpio.h \
     $(wildcard include/config/gpiolib.h) \
     $(wildcard include/config/arch/have/custom/gpio/h.h) \
@@ -488,7 +516,6 @@ deps_/home/station02/Lab3/interrupt.o := \
   include/asm-generic/gpio.h \
     $(wildcard include/config/of/gpio.h) \
     $(wildcard include/config/of.h) \
-    $(wildcard include/config/pinctrl.h) \
     $(wildcard include/config/gpio/sysfs.h) \
   include/linux/of.h \
     $(wildcard include/config/sparc.h) \
@@ -505,8 +532,11 @@ deps_/home/station02/Lab3/interrupt.o := \
   include/uapi/linux/uuid.h \
   /opt/PHYTEC_BSPs/yocto_ti/build/tmp-glibc/work/phyboard_wega_am335x_1-phytec-linux-gnueabi/linux-ti/3.12.30-phy2-r0/git/arch/arm/include/asm/prom.h \
   include/linux/pinctrl/pinctrl.h \
-  include/linux/seq_file.h \
-  include/linux/pinctrl/pinctrl-state.h \
+  include/linux/delay.h \
+  /opt/PHYTEC_BSPs/yocto_ti/build/tmp-glibc/work/phyboard_wega_am335x_1-phytec-linux-gnueabi/linux-ti/3.12.30-phy2-r0/git/arch/arm/include/asm/delay.h \
+  /opt/PHYTEC_BSPs/yocto_ti/build/tmp-glibc/work/phyboard_wega_am335x_1-phytec-linux-gnueabi/linux-ti/3.12.30-phy2-r0/git/arch/arm/include/asm/uaccess.h \
+  /opt/PHYTEC_BSPs/yocto_ti/build/tmp-glibc/work/phyboard_wega_am335x_1-phytec-linux-gnueabi/linux-ti/3.12.30-phy2-r0/git/arch/arm/include/asm/unified.h \
+    $(wildcard include/config/arm/asm/unified.h) \
   include/linux/interrupt.h \
     $(wildcard include/config/irq/forced/threading.h) \
     $(wildcard include/config/generic/irq/probe.h) \
@@ -636,33 +666,6 @@ deps_/home/station02/Lab3/interrupt.o := \
   include/linux/key.h \
   include/linux/selinux.h \
     $(wildcard include/config/security/selinux.h) \
-  include/linux/cdev.h \
-  include/linux/device.h \
-    $(wildcard include/config/debug/devres.h) \
-    $(wildcard include/config/acpi.h) \
-    $(wildcard include/config/dma/cma.h) \
-    $(wildcard include/config/devtmpfs.h) \
-    $(wildcard include/config/sysfs/deprecated.h) \
-  include/linux/ioport.h \
-  include/linux/klist.h \
-  include/linux/pinctrl/devinfo.h \
-    $(wildcard include/config/pm.h) \
-  include/linux/pinctrl/consumer.h \
-  include/linux/pm.h \
-    $(wildcard include/config/vt/console/sleep.h) \
-    $(wildcard include/config/pm/runtime.h) \
-    $(wildcard include/config/pm/clk.h) \
-    $(wildcard include/config/pm/generic/domains.h) \
-  include/linux/ratelimit.h \
-  /opt/PHYTEC_BSPs/yocto_ti/build/tmp-glibc/work/phyboard_wega_am335x_1-phytec-linux-gnueabi/linux-ti/3.12.30-phy2-r0/git/arch/arm/include/asm/device.h \
-    $(wildcard include/config/dmabounce.h) \
-    $(wildcard include/config/iommu/api.h) \
-    $(wildcard include/config/arm/dma/use/iommu.h) \
-    $(wildcard include/config/arch/omap.h) \
-  include/linux/pm_wakeup.h \
-  /opt/PHYTEC_BSPs/yocto_ti/build/tmp-glibc/work/phyboard_wega_am335x_1-phytec-linux-gnueabi/linux-ti/3.12.30-phy2-r0/git/arch/arm/include/asm/uaccess.h \
-  /opt/PHYTEC_BSPs/yocto_ti/build/tmp-glibc/work/phyboard_wega_am335x_1-phytec-linux-gnueabi/linux-ti/3.12.30-phy2-r0/git/arch/arm/include/asm/unified.h \
-    $(wildcard include/config/arm/asm/unified.h) \
 
 /home/station02/Lab3/interrupt.o: $(deps_/home/station02/Lab3/interrupt.o)
 
