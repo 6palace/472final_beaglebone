@@ -53,10 +53,10 @@ int main() {
 
 	while(1) {
 		printf("Waiting.\n");
-		ret = poll(pfd, NUMPOLL, -1);
+		ret = poll(pfd, NUMPOLL, 3);
 		
       if(ret > 0) { //Something happened
-      printf("Something is unblocked!\n", ret);
+      printf("Something is unblocked!\n");
          if (pfd[0].revents & POLLIN) {
             read(fd, databuf, 1024);
             //printf("Received: %s", databuf);
@@ -69,11 +69,18 @@ int main() {
                printf(" %s\n", tok);
                tok = strtok(NULL, ",\n");
             }
+            printf("exit");
          }
          if (pfd[1].revents & POLLIN) {
             printf("Received2:");
+            //lseek(fd2,1000,SEEK_SET); //seek so that the kernel module knows the value is read
             read(fd2, databuf, 1024);
+
+            //FILE* fpTmp = fdopen(fd2,"r");
+            //fread(databuf, 1024, 3, fpTmp);
+
             printf(" %s\n", databuf);
+            printf("exit");
          }
       }
 	}

@@ -8,13 +8,17 @@ static unsigned int gpioButton = 20;   ///< hard coding the button gpio for this
 static unsigned int gpioButton2 = 106;   ///< hard coding the button gpio for this example to P9_27 (GPIO115)
 static unsigned int irqNumber;          ///< Used to share the IRQ number within this file
 static unsigned int irqNumber2;          ///< Used to share the IRQ number within this file
-static unsigned int numberPresses = 0;  ///< For information, store the number of button presses
-static bool     ledOn = 0;          ///< Is the LED on or off? Used to invert its state (off by default)
+
+static wait_queue_head_t wq;
+
 
 static int __init driver_entry(void) {
    int ret, result, result2;
    //Make a device class
    modclass = class_create(THIS_MODULE, CLASS_NAME);
+
+   //Init wait queue
+   init_waitqueue_head(&wq);
 
    //Get major and minor number for device
    ret = alloc_chrdev_region(&dev_num, 0, 1, DEVICE_NAME);
@@ -36,7 +40,7 @@ static int __init driver_entry(void) {
    }
    device_create(modclass, NULL, dev_num, NULL, DEVICE_NAME);
    printk(KERN_INFO DEVICE_NAME": Created\n");
-   
+
    // Initialize SEMAPHORE
    sema_init(&virtual_device.sem, 1);
    result = 0;
@@ -80,7 +84,6 @@ static int __init driver_entry(void) {
 
 static void __exit driver_exit(void) {
    printk(KERN_INFO "GPIO_TEST: The button state is currently: %d\n", gpio_get_value(gpioButton));
-   printk(KERN_INFO "GPIO_TEST: The button was pressed %d times\n", numberPresses);
    free_irq(irqNumber, NULL);               // Free the IRQ number, no *dev_id required in this case
    free_irq(irqNumber2, NULL);               // Free the IRQ number, no *dev_id required in this case
    gpio_unexport(gpioButton);               // Unexport the Button GPIO
@@ -113,6 +116,7 @@ int device_close(struct inode* inode, struct  file *filp) {
 
 static irq_handler_t ebbgpio_irq_handler(unsigned int irq, void *dev_id, struct pt_regs *regs) {
    printk(KERN_INFO "GPIO_TEST: Interrupt! (button state is %d)\n", gpio_get_value(gpioButton));
+   wake_up_interruptible(&wq); //Wake up any blocking reads
    virtual_device.button = (irq == irqNumber);
    virtual_device.interruptWaiting = 1;
    return (irq_handler_t) IRQ_HANDLED;      // Announce that the IRQ has been handled correctly
@@ -123,10 +127,11 @@ ssize_t device_read(struct file* filp, char* bufStoreData,
    int ret;
    char* buttonStr ;
 
-   //TODO: PROBLEM: control won't exit until this is done blocking.
-   while(!virtual_device.interruptWaiting) { //block until the interrupt happens
-      msleep(50); 
-   }
+   if(*curOffset > 0) return 0;
+
+   printk(KERN_DEBUG "process %i (%s) going to sleep\n",
+   current->pid, current->comm);
+   wait_event_interruptible(wq, virtual_device.interruptWaiting);
 
    if (virtual_device.button)
       buttonStr = "1\n";
@@ -134,6 +139,7 @@ ssize_t device_read(struct file* filp, char* bufStoreData,
       buttonStr = "0\n";
 
    ret = copy_to_user(bufStoreData, buttonStr, strlen(buttonStr));
+   *curOffset += strlen(buttonStr);
    virtual_device.interruptWaiting = 0;
    return strlen(buttonStr);   
 }

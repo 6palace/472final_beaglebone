@@ -13,11 +13,13 @@
 #include <linux/gpio.h>
 #include <linux/delay.h>
 #include <linux/init.h>
+#include <linux/wait.h>
 #include <asm/uaccess.h>
 #include <linux/interrupt.h>            // Required for the IRQ code
 #include <asm/siginfo.h>   //siginfo
 #include <linux/rcupdate.h>   //rcu_read_lock
 #include <linux/sched.h>   //find_task_by_pid_type
+
 
 #define DEVICE_NAME "ib"
 #define CLASS_NAME "inbu"
