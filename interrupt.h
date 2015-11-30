@@ -14,11 +14,6 @@
 #include <linux/delay.h>
 #include <linux/init.h>
 #include <asm/uaccess.h>
-#include <linux/init.h>
-#include <linux/module.h>
-#include <linux/kernel.h>
-#include <linux/fs.h>
-#include <linux/gpio.h>                 // Required for the GPIO functions
 #include <linux/interrupt.h>            // Required for the IRQ code
 #include <asm/siginfo.h>   //siginfo
 #include <linux/rcupdate.h>   //rcu_read_lock

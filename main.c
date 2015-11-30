@@ -19,7 +19,7 @@
 #include <unistd.h>
 #include <string.h>
 
-#define NUMPOLL 1
+#define NUMPOLL 2
 
 int main() {
 	printf("Control Program\n");
@@ -39,35 +39,43 @@ int main() {
 	int fd, fd2;
 	char* tok;
 
-	//fd = open("/tmp/adcData", O_RDONLY);
-	fd = open("/dev/ib", O_RDONLY); //fd2
+	fd = open("/tmp/adcData", O_RDONLY);
+	fd2 = open("/dev/ib", O_RDONLY); //fd2
 
-	pfd[0].fd = fd;
 	//pfd[0].events = POLLIN | POLLERR | POLLHUP;
+
+	pfd[0].fd = fd;	
 	pfd[0].events = POLLIN;
-	//pfd[1].fd = fd2;
-	//pfd[0].events = POLLIN | POLLERR | POLLHUP;
-	//pfd[1].events = POLLIN;
+	pfd[1].fd = fd2;
+	pfd[1].events = POLLIN;
 
 	char databuf[1024] = "";
-
-	//TODO:Just take 12bit values and send them over the pipe then chop on 12 bit boundaries. No ascii conversion required
 
 	while(1) {
 		printf("Waiting.\n");
 		ret = poll(pfd, NUMPOLL, -1);
-		read(fd, databuf, 1024);
-		//printf("Received: %s", databuf);
-		printf("Received:");
-	   tok = strtok(databuf, ",\n");
-	   int i = 0;
-	   while(i < 4 && tok != NULL) 
-	   {
-	   	i++;
-	      printf(" %s\n", tok);
-	      tok = strtok(NULL, ",\n");
-	   }
-
+		
+      if(ret > 0) { //Something happened
+      printf("Something is unblocked!\n", ret);
+         if (pfd[0].revents & POLLIN) {
+            read(fd, databuf, 1024);
+            //printf("Received: %s", databuf);
+            printf("Received:");
+            tok = strtok(databuf, ",\n");
+            int i = 0;
+            while(i < 4 && tok != NULL) 
+            {
+               i++;
+               printf(" %s\n", tok);
+               tok = strtok(NULL, ",\n");
+            }
+         }
+         if (pfd[1].revents & POLLIN) {
+            printf("Received2:");
+            read(fd2, databuf, 1024);
+            printf(" %s\n", databuf);
+         }
+      }
 	}
 
 	//END MAIN PROGRAM
