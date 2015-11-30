@@ -156,13 +156,23 @@ ssize_t device_read(struct file* filp, char* bufStoreData,
       buttonStr = "1\n";
    else
       buttonStr = "0\n";
-   if (virtual_device.interruptWaiting) {
+
+
+      //Block until interrupt waiting
+
+
+   while(!virtual_device.interruptWaiting) {
+         //spin!
+         msleep(59);
+   }
+   //if (virtual_device.interruptWaiting) {
       ret = copy_to_user(bufStoreData, buttonStr, strlen(buttonStr));
       virtual_device.interruptWaiting = 0;
       return strlen(buttonStr);
-      //return 0;
-   }
-   return 1;
+   //}  
+
+
+   
 }
 
 ssize_t device_write(struct file* filp, const char* bufSource,
