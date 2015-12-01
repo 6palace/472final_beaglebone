@@ -54,16 +54,11 @@ int main() {
 	char databuf[1024] = "";
 
 	while(1) {
-		printf("Waiting.\n");
 		ret = poll(pfd, NUMPOLL, -1);
-		
       if(ret > 0) { //Something happened
-      printf("Something is unblocked!\n");
          if (pfd[0].revents & POLLIN) {
-            printf("Received:");
+            printf("ADC:\n");
             read(fd, databuf, 1024);
-            //printf("Received: %s", databuf);
-            
             tok = strtok(databuf, ",\n");
             int i = 0;
             while(i < 4 && tok != NULL) 
@@ -72,19 +67,10 @@ int main() {
                printf(" %s\n", tok);
                tok = strtok(NULL, ",\n");
             }
-            printf("exit\n");
          }
          if (pfd[1].revents & POLLIN) {
-            printf("Received2:\n");
-            //lseek(fd2,1,SEEK_SET); //seek so that the kernel module knows the value is read
             read(fd2, databuf, 2);
-
-            //FILE* fpTmp = fdopen(fd2,"r");
-            //fread(databuf, 1024, 3, fpTmp);
-            //fread(databuf, 1024, 3, fp2);
-
-            printf(" %s\n", databuf);
-            printf("exit\n");
+            printf("Button: %s\n", databuf);
          }
       }
 	}
@@ -98,7 +84,7 @@ int main() {
 			system ("./adc");
 			printf("ADC\n");
 		} else {
-			//system ("./motor");
+			system ("./motor");
 			printf("MOTOR\n");
 		}
 	}

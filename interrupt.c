@@ -127,32 +127,19 @@ ssize_t device_read(struct file* filp, char* bufStoreData,
    int ret;
    char* buttonStr ;
 
-      printk("offset is at %d\n", *curOffset);
+   printk("offset is at %d\n", *curOffset);
    if(*curOffset > 0)  {
       *curOffset = 0;
       return 0;
    }
 
-
-   //printk(KERN_DEBUG "process %i (%s) going to sleep\n",
-   //current->pid, current->comm);
-   
-
-   //wait_event_interruptible(wq, virtual_device.interruptWaiting);
-   
-   //while(!virtual_device.interruptWaiting) {
-   //   msleep(50);
-   //}
-
    if (virtual_device.button)
-      buttonStr = "1\n";
+      buttonStr = "1";
    else
-      buttonStr = "0\n";
+      buttonStr = "0";
 
-   ret = copy_to_user(bufStoreData, buttonStr, strlen(buttonStr));
+   ret = copy_to_user(bufStoreData, buttonStr, strlen(buttonStr)+1);
    *curOffset += strlen(buttonStr);
-   //virtual_device.fOff += strlen(buttonStr);
-
    virtual_device.interruptWaiting = 0;
    return strlen(buttonStr);   
 }
