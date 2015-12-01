@@ -41,6 +41,8 @@ int main() {
 
 	fd = open("/tmp/adcData", O_RDONLY);
 	fd2 = open("/dev/ib", O_RDONLY); //fd2
+   //FILE* fp2 = fopen("/dev/ib", "r");
+   //fd2 = fileno(fp2);
 
 	//pfd[0].events = POLLIN | POLLERR | POLLHUP;
 
@@ -53,14 +55,15 @@ int main() {
 
 	while(1) {
 		printf("Waiting.\n");
-		ret = poll(pfd, NUMPOLL, 3);
+		ret = poll(pfd, NUMPOLL, -1);
 		
       if(ret > 0) { //Something happened
       printf("Something is unblocked!\n");
          if (pfd[0].revents & POLLIN) {
+            printf("Received:");
             read(fd, databuf, 1024);
             //printf("Received: %s", databuf);
-            printf("Received:");
+            
             tok = strtok(databuf, ",\n");
             int i = 0;
             while(i < 4 && tok != NULL) 
@@ -69,18 +72,19 @@ int main() {
                printf(" %s\n", tok);
                tok = strtok(NULL, ",\n");
             }
-            printf("exit");
+            printf("exit\n");
          }
          if (pfd[1].revents & POLLIN) {
-            printf("Received2:");
-            //lseek(fd2,1000,SEEK_SET); //seek so that the kernel module knows the value is read
-            read(fd2, databuf, 1024);
+            printf("Received2:\n");
+            //lseek(fd2,1,SEEK_SET); //seek so that the kernel module knows the value is read
+            read(fd2, databuf, 1);
 
             //FILE* fpTmp = fdopen(fd2,"r");
             //fread(databuf, 1024, 3, fpTmp);
+            //fread(databuf, 1024, 3, fp2);
 
             printf(" %s\n", databuf);
-            printf("exit");
+            printf("exit\n");
          }
       }
 	}
@@ -94,7 +98,7 @@ int main() {
 			system ("./adc");
 			printf("ADC\n");
 		} else {
-			system ("./motor");
+			//system ("./motor");
 			printf("MOTOR\n");
 		}
 	}

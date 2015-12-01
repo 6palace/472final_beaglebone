@@ -19,6 +19,7 @@
 #include <asm/siginfo.h>   //siginfo
 #include <linux/rcupdate.h>   //rcu_read_lock
 #include <linux/sched.h>   //find_task_by_pid_type
+#include <linux/poll.h>       
 
 
 #define DEVICE_NAME "ib"
@@ -34,6 +35,7 @@ struct device_info {
 	int interruptWaiting;
 	int buttonSent;
 	int button;
+	int fOff;
 } virtual_device;
 
 /* global variables */
@@ -73,13 +75,16 @@ ssize_t device_read(struct file*, char*, size_t, loff_t*);
 // Called when user wants to send info to device
 ssize_t device_write(struct file*, const char*, size_t, loff_t*);
 
+int device_poll(struct file* filp , poll_table * pwait);
+
 /* operations usable by this file. */
 static struct file_operations fops = {
 	.owner = THIS_MODULE,
 	.read = device_read,
 	.write = device_write,
 	.open = device_open,
-	.release = device_close
+	.release = device_close,
+	.poll = device_poll
 };
 
 #endif

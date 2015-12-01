@@ -22,13 +22,11 @@ __attribute__((section("__versions"))) = {
 	{ 0xfa3eb986, __VMLINUX_SYMBOL_STR(cdev_del) },
 	{ 0x67c2fa54, __VMLINUX_SYMBOL_STR(__copy_to_user) },
 	{ 0x7ffc8718, __VMLINUX_SYMBOL_STR(gpio_set_debounce) },
-	{ 0xc8b57c27, __VMLINUX_SYMBOL_STR(autoremove_wake_function) },
 	{ 0x47229b5c, __VMLINUX_SYMBOL_STR(gpio_request) },
 	{ 0x1afae5e7, __VMLINUX_SYMBOL_STR(down_interruptible) },
 	{ 0x3e580f16, __VMLINUX_SYMBOL_STR(device_destroy) },
 	{ 0x7485e15e, __VMLINUX_SYMBOL_STR(unregister_chrdev_region) },
 	{ 0x275ef902, __VMLINUX_SYMBOL_STR(__init_waitqueue_head) },
-	{ 0x5f754e5a, __VMLINUX_SYMBOL_STR(memset) },
 	{ 0x65d6d0f0, __VMLINUX_SYMBOL_STR(gpio_direction_input) },
 	{ 0x27e1a049, __VMLINUX_SYMBOL_STR(printk) },
 	{ 0x82f776b7, __VMLINUX_SYMBOL_STR(gpio_export) },
@@ -36,14 +34,11 @@ __attribute__((section("__versions"))) = {
 	{ 0xd6b8e852, __VMLINUX_SYMBOL_STR(request_threaded_irq) },
 	{ 0x54594cd, __VMLINUX_SYMBOL_STR(cdev_add) },
 	{ 0x11f447ce, __VMLINUX_SYMBOL_STR(__gpio_to_irq) },
-	{ 0x1000e51, __VMLINUX_SYMBOL_STR(schedule) },
 	{ 0xd85cd67e, __VMLINUX_SYMBOL_STR(__wake_up) },
 	{ 0xfe990052, __VMLINUX_SYMBOL_STR(gpio_free) },
-	{ 0x499cb58c, __VMLINUX_SYMBOL_STR(prepare_to_wait) },
 	{ 0x6c8d5ae8, __VMLINUX_SYMBOL_STR(__gpio_get_value) },
 	{ 0x4be7fb63, __VMLINUX_SYMBOL_STR(up) },
 	{ 0x6801e39c, __VMLINUX_SYMBOL_STR(class_destroy) },
-	{ 0x1cfb04fa, __VMLINUX_SYMBOL_STR(finish_wait) },
 	{ 0xe61a6d2f, __VMLINUX_SYMBOL_STR(gpio_unexport) },
 	{ 0x3e26490d, __VMLINUX_SYMBOL_STR(__class_create) },
 	{ 0x29537c9e, __VMLINUX_SYMBOL_STR(alloc_chrdev_region) },
@@ -56,4 +51,4 @@ __attribute__((section(".modinfo"))) =
 "depends=";
 
 
-MODULE_INFO(srcversion, "774EB143150D86ED86A410E");
+MODULE_INFO(srcversion, "7AF4E3337BDAFDF5EDDAAC1");

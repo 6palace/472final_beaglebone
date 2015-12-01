@@ -127,11 +127,22 @@ ssize_t device_read(struct file* filp, char* bufStoreData,
    int ret;
    char* buttonStr ;
 
-   if(*curOffset > 0) return 0;
+      printk("offset is at %d\n", *curOffset);
+   if(*curOffset > 0)  {
+      *curOffset = 0;
+      return 0;
+   }
 
-   printk(KERN_DEBUG "process %i (%s) going to sleep\n",
-   current->pid, current->comm);
-   wait_event_interruptible(wq, virtual_device.interruptWaiting);
+
+   //printk(KERN_DEBUG "process %i (%s) going to sleep\n",
+   //current->pid, current->comm);
+   
+
+   //wait_event_interruptible(wq, virtual_device.interruptWaiting);
+   
+   //while(!virtual_device.interruptWaiting) {
+   //   msleep(50);
+   //}
 
    if (virtual_device.button)
       buttonStr = "1\n";
@@ -140,9 +151,22 @@ ssize_t device_read(struct file* filp, char* bufStoreData,
 
    ret = copy_to_user(bufStoreData, buttonStr, strlen(buttonStr));
    *curOffset += strlen(buttonStr);
+   //virtual_device.fOff += strlen(buttonStr);
+
    virtual_device.interruptWaiting = 0;
    return strlen(buttonStr);   
 }
+
+int device_poll(struct file* filp , poll_table * pwait) {
+   unsigned int mask;
+   printk("Poll was called\n");
+   mask = 0;
+   if (virtual_device.interruptWaiting)
+      mask |= POLLIN | POLLRDNORM;
+
+   return mask;
+}
+
 
 ssize_t device_write(struct file* filp, const char* bufSource,
    size_t bufLength, loff_t* curOffset) {

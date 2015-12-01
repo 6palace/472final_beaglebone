@@ -666,6 +666,10 @@ deps_/home/station02/Lab3/interrupt.o := \
   include/linux/key.h \
   include/linux/selinux.h \
     $(wildcard include/config/security/selinux.h) \
+  include/linux/poll.h \
+  include/uapi/linux/poll.h \
+  arch/arm/include/generated/asm/poll.h \
+  /opt/PHYTEC_BSPs/yocto_ti/build/tmp-glibc/work/phyboard_wega_am335x_1-phytec-linux-gnueabi/linux-ti/3.12.30-phy2-r0/git/include/uapi/asm-generic/poll.h \
 
 /home/station02/Lab3/interrupt.o: $(deps_/home/station02/Lab3/interrupt.o)
 
