@@ -35,7 +35,6 @@ struct device_info {
 	int interruptWaiting;
 	int buttonSent;
 	int button;
-	int fOff;
 } virtual_device;
 
 /* global variables */

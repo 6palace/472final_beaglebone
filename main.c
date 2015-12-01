@@ -66,6 +66,11 @@ int main() {
                i++;
                printf(" %s\n", tok);
                tok = strtok(NULL, ",\n");
+
+               if () {
+
+               }
+
             }
          }
          if (pfd[1].revents & POLLIN) {

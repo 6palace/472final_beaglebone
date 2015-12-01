@@ -14,11 +14,13 @@ static wait_queue_head_t wq;
 
 static int __init driver_entry(void) {
    int ret, result, result2;
+
    //Make a device class
    modclass = class_create(THIS_MODULE, CLASS_NAME);
 
    //Init wait queue
    init_waitqueue_head(&wq);
+   virtual_device.interruptWaiting = 0;
 
    //Get major and minor number for device
    ret = alloc_chrdev_region(&dev_num, 0, 1, DEVICE_NAME);
@@ -128,19 +130,23 @@ ssize_t device_read(struct file* filp, char* bufStoreData,
    char* buttonStr ;
 
    printk("offset is at %d\n", *curOffset);
-   if(*curOffset > 0)  {
+   /*if(*curOffset > 0)  {
       *curOffset = 0;
       return 0;
+   } */if(!virtual_device.interruptWaiting)  {
+      return 0;
    }
+
+   //wait_event_interruptible(wq, virtual_device.interruptWaiting == 1);
 
    if (virtual_device.button)
       buttonStr = "1";
    else
       buttonStr = "0";
-
-   ret = copy_to_user(bufStoreData, buttonStr, strlen(buttonStr)+1);
-   *curOffset += strlen(buttonStr);
    virtual_device.interruptWaiting = 0;
+   ret = copy_to_user(bufStoreData, buttonStr, strlen(buttonStr)+1);
+   //*curOffset += strlen(buttonStr);
+   
    return strlen(buttonStr);   
 }
 
