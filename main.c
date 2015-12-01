@@ -77,7 +77,7 @@ int main() {
          if (pfd[1].revents & POLLIN) {
             printf("Received2:\n");
             //lseek(fd2,1,SEEK_SET); //seek so that the kernel module knows the value is read
-            read(fd2, databuf, 1);
+            read(fd2, databuf, 2);
 
             //FILE* fpTmp = fdopen(fd2,"r");
             //fread(databuf, 1024, 3, fpTmp);

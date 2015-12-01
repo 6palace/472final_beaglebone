@@ -157,9 +157,12 @@ ssize_t device_read(struct file* filp, char* bufStoreData,
    return strlen(buttonStr);   
 }
 
-int device_poll(struct file* filp , poll_table * pwait) {
+int device_poll(struct file* filp , poll_table* wait) {
    unsigned int mask;
    printk("Poll was called\n");
+
+   poll_wait(filp, &wq, wait);
+
    mask = 0;
    if (virtual_device.interruptWaiting)
       mask |= POLLIN | POLLRDNORM;
