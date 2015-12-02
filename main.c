@@ -67,9 +67,7 @@ int main() {
                printf(" %s\n", tok);
                tok = strtok(NULL, ",\n");
 
-               if () {
 
-               }
 
             }
          }

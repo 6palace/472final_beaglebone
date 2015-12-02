@@ -2,6 +2,7 @@
 #EE472 Group F Lab 3
 
 export ARCH=arm
+#export CROSS_COMPILE=arm-linux-gnueabihf-
 export CROSS_COMPILE=arm-linux-gnueabihf-
 ccflags-y := -std=gnu99
 
@@ -13,7 +14,9 @@ gpioKern-objs := interrupt.o
 export-objs := shiftReg.o mainMod_sr.o
 
 # Kernel source directory
-KDIR =/opt/PHYTEC_BSPs/yocto_ti/build/tmp-glibc/work/phyboard_wega_am335x_1-phytec-linux-gnueabi/linux-ti/3.12.30-phy2-r0/git
+#KDIR =/opt/PHYTEC_BSPs/yocto_ti/build/tmp-glibc/work/phyboard_wega_am335x_1-phytec-linux-gnueabi/linux-ti/3.12.30-phy2-r0/git
+KDIR =/home/alex/Desktop/morebea/linux
+#CROSS = /home/alex/Desktop/beagle/kernelbuild/setup-scripts/build/tmp-angstrom_v2014_12-glibc/sysroots/x86_64-linux/usr/bin/arm-angstrom-linux-gnueabi/
 PWD = $(shell pwd)
 
 default:
@@ -28,7 +31,7 @@ mainprog: main.c
 	arm-linux-gnueabihf-gcc main.c -std=gnu99 -g -o control -lrt
 
 adcprog: adc.c adc.h
-	arm-linux-gnueabihf-gcc adc.c -std=gnu99 -g -o adc -lrt
+	arm-linux-gnueabihf-gcc adc.c -std=gnu99 -g -o adc -lrt  -mfloat-abi=hard
 
 moprog: motor.c
 	arm-linux-gnueabihf-gcc motor.c -std=gnu99 -g -o motor -lrt
