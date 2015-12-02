@@ -1,6 +1,8 @@
 //adc.c
 
-#include "adc.h"      
+#include "adc.h"
+#include <time.h> 
+#include <signal.h>     
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -9,6 +11,7 @@
 int main() {
 	mknod("/tmp/adcData", S_IFIFO, 0);
 	FILE* adcOut = fopen("/tmp/adcData", "w");
+	int timer = timer_create()
 	while(1) {
 		fprintf(adcOut, "%d,%d,%d,%d\n", readADC(4), readADC(5), readADC(6), readADC(7));
 		fflush(adcOut);
