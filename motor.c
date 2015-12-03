@@ -9,12 +9,12 @@
 #define GPIO_AIN2 47
 #define GPIO_BIN1 45
 #define GPIO_BIN2 68
-#define CHIP_PWMA 0
+#define CHIP_PWMA "48304100.ecap"
 #define ID_PWMA 0
-#define CHIP_PWMB 4
+#define CHIP_PWMB "48302200.ehrpwm"
 #define ID_PWMB 1
 
-//Directions
+//DirectionsE
 #define OFF 0
 #define FORWARD 1
 #define BACKWARD 2
@@ -24,6 +24,7 @@
 #define M_RIGHT 0
 #define M_LEFT 1
 
+int findPWM(char* whatPWM);
 
 FILE* ain1;
 FILE* ain2;
@@ -33,12 +34,25 @@ pwmAttr pwmA;
 pwmAttr pwmB;
 
 int main() {
+
+	//Beagle init
+   FILE* bbPinMux = fopen("/sys/devices/platform/ocp/ocp:P9_42_pinmux/state", "w");
+   fprintf(bbPinMux, "pwm");
+   fflush(bbPinMux);
+   fclose(bbPinMux);   
+   bbPinMux = fopen("/sys/devices/platform/ocp/ocp:P9_16_pinmux/state", "w");
+   fprintf(bbPinMux, "pwm");
+   fflush(bbPinMux);
+   fclose(bbPinMux);
+   //Beagle init done
+
 	ain1 = initGPIO(GPIO_AIN1);
 	ain2 = initGPIO(GPIO_AIN2);
 	bin1 = initGPIO(GPIO_BIN1);
 	bin2 = initGPIO(GPIO_BIN2);
-	pwmA = initPWM(CHIP_PWMA, ID_PWMA);
-	pwmB = initPWM(CHIP_PWMB, ID_PWMB);
+	pwmA = initPWM(findPWM(CHIP_PWMA), ID_PWMA);
+	pwmB = initPWM(findPWM(CHIP_PWMB), ID_PWMB);
+
 	fprintf(pwmA.enable, "%s", "1");
 	fprintf(pwmB.enable, "%s", "1");
 
@@ -56,6 +70,18 @@ int main() {
 	fclose(bin2);
 
 	return 0;
+}
+
+int findPWM(char* whatPWM) {
+   char pwmLoc[1024];
+   sprintf (pwmLoc, "ls /sys/devices/platform/ocp/subsystem/devices/%s/pwm | grep -o '[0-9]'", whatPWM);
+   int wherePWMint;
+   char wherePWMstr[5];
+   FILE* wherePWM = popen(pwmLoc, "r");
+   fgets(wherePWMstr, sizeof(wherePWMstr), wherePWM);
+   pclose(wherePWM);
+   sscanf(wherePWMstr, "%d", &wherePWMint);
+   return wherePWMint;
 }
 
 void setMotor(int whichMotor, int direction, int percent) {
@@ -143,7 +169,7 @@ pwmAttr initPWM(int chipNum, int subID) {
 	char exportC[256];
 	sprintf(exportC, "/sys/class/pwm/pwmchip%d/export", chipNum);
 	FILE *PWM1 = fopen(exportC, "w");
-	fprintf(PWM1, "%s", "0");
+	fprintf(PWM1, "%d", subID);
 	fflush(PWM1);
 	fclose(PWM1);
 
