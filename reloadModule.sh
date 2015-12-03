@@ -1,4 +1,4 @@
-#!/bin/ash
+#!/bin/bash
 
 rmmod gpioKern
 rmmod lcdmod

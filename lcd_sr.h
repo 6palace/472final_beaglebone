@@ -26,9 +26,9 @@
 #define LCDcursor_underline 0x0e
 #define LCDcursor_right 0x10
 
-#define lcdE 17
-#define lcdRW 16
-#define lcdRS 100
+#define lcdE 69
+#define lcdRW 67
+#define lcdRS 66
 
 
 //performs init/reset sequence on LCD

@@ -16,6 +16,14 @@ void timeHandler(int sigNo, siginfo_t * evp, void * ucontext);
 FILE* adcOut;
 
 int main() {
+
+   //init adc beaglebone
+   //echo BB-ADC > /sys/devices/platform/bone_capemgr/slots
+   /*FILE* bbCape = fopen("/sys/devices/platform/bone_capemgr/slots", "w");
+   fprintf(bbCape, "BB-ADC");
+   fflush(bbCape);
+   fclose(bbCape);
+
    mknod("/tmp/adcData", S_IFIFO, 0);
    adcOut = fopen("/tmp/adcData", "w");
 
@@ -37,13 +45,19 @@ int main() {
    newTime.it_value.tv_sec     = 0; 
    newTime.it_value.tv_nsec    = 1;
    newTime.it_interval.tv_sec  = 0;
-   newTime.it_interval.tv_nsec = 100000000;
+   newTime.it_interval.tv_nsec = 1000000000;
 
    timer_create(CLOCK_REALTIME, &sigx, &timer);
    timer_settime(timer, 0,  &newTime, NULL);
 
    while(1)
-      pause();
+      pause();*/
+      printf("%d,%d,%d,%d\n", readADC(0), readADC(1), readADC(2), readADC(3));
+   printf("%d,%d,%d,%d\n", readADC(0), readADC(1), readADC(2), readADC(3));
+   printf("%d,%d,%d,%d\n", readADC(0), readADC(1), readADC(2), readADC(3));
+   printf("%d,%d,%d,%d\n", readADC(0), readADC(1), readADC(2), readADC(3));
+   printf("%d,%d,%d,%d\n", readADC(0), readADC(1), readADC(2), readADC(3));
+   
 
    return 0;
 }
@@ -61,6 +75,7 @@ int readADC(int whichADC) {
 }
 
 void timeHandler(int sigNo, siginfo_t * evp, void * ucontext) {
-	printf("called\n");
-	fprintf(adcOut, "%d,%d,%d,%d\n", readADC(4), readADC(5), readADC(6), readADC(7));
+	//printf("called\n");
+   //fprintf(adcOut, "%d,%d,%d,%d\n", readADC(0), readADC(1), readADC(2), readADC(3));
+	printf("%d,%d,%d,%d\n", readADC(0), readADC(1), readADC(2), readADC(3));
 }

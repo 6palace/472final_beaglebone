@@ -5,14 +5,14 @@
 
 
 //PINS!
-#define GPIO_AIN1 71
-#define GPIO_AIN2 73
-#define GPIO_BIN1 72
-#define GPIO_BIN2 70
+#define GPIO_AIN1 44
+#define GPIO_AIN2 47
+#define GPIO_BIN1 45
+#define GPIO_BIN2 68
 #define CHIP_PWMA 0
 #define ID_PWMA 0
 #define CHIP_PWMB 4
-#define ID_PWMB 0
+#define ID_PWMB 1
 
 //Directions
 #define OFF 0

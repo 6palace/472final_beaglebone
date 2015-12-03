@@ -1,9 +1,9 @@
 
 #include "shiftReg.h"
 
-#define SERIAL_SR_DATA 62
-#define SERIAL_SR_LATCH 8
-#define SERIAL_SR_CLK 9
+#define SERIAL_SR_DATA 31
+#define SERIAL_SR_LATCH 30
+#define SERIAL_SR_CLK 60
 #define DELAY 1
 
 void initSR() {

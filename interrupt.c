@@ -129,7 +129,7 @@ ssize_t device_read(struct file* filp, char* bufStoreData,
    int ret;
    char* buttonStr ;
 
-   printk("offset is at %d\n", *curOffset);
+  // printk("offset is at %d\n", *curOffset);
    /*if(*curOffset > 0)  {
       *curOffset = 0;
       return 0;
@@ -152,7 +152,7 @@ ssize_t device_read(struct file* filp, char* bufStoreData,
 
 int device_poll(struct file* filp , poll_table* wait) {
    unsigned int mask;
-   printk("Poll was called\n");
+   //printk("Poll was called\n");
 
    poll_wait(filp, &wq, wait);
 
