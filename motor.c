@@ -9,7 +9,8 @@
 #define GPIO_AIN2 47
 #define GPIO_BIN1 45
 #define GPIO_BIN2 68
-#define CHIP_PWMA "48304100.ecap"
+//#define CHIP_PWMA "48304100.ecap" //ecap moves around
+#define CHIP_PWMA "48302200.ehrpwm"
 #define ID_PWMA 0
 #define CHIP_PWMB "48302200.ehrpwm"
 #define ID_PWMB 1
@@ -36,7 +37,7 @@ pwmAttr pwmB;
 int main() {
 
 	//Beagle init
-   FILE* bbPinMux = fopen("/sys/devices/platform/ocp/ocp:P9_42_pinmux/state", "w");
+   FILE* bbPinMux = fopen("/sys/devices/platform/ocp/ocp:P9_14_pinmux/state", "w");
    fprintf(bbPinMux, "pwm");
    fflush(bbPinMux);
    fclose(bbPinMux);   
@@ -44,6 +45,10 @@ int main() {
    fprintf(bbPinMux, "pwm");
    fflush(bbPinMux);
    fclose(bbPinMux);
+
+   printf("pwmchip is %d\n", findPWM(CHIP_PWMA));
+   printf("pwmchip is %d\n", findPWM(CHIP_PWMB));
+
    //Beagle init done
 
 	ain1 = initGPIO(GPIO_AIN1);
@@ -73,6 +78,7 @@ int main() {
 }
 
 int findPWM(char* whatPWM) {
+   printf("Finding %s\n", whatPWM);
    char pwmLoc[1024];
    sprintf (pwmLoc, "ls /sys/devices/platform/ocp/subsystem/devices/%s/pwm | grep -o '[0-9]'", whatPWM);
    int wherePWMint;
