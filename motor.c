@@ -2,14 +2,12 @@
 
 #include "motor.h"
 
-
-
 //PINS!
 #define GPIO_AIN1 44
 #define GPIO_AIN2 47
 #define GPIO_BIN1 45
 #define GPIO_BIN2 68
-//#define CHIP_PWMA "48304100.ecap" //ecap moves around
+//#define CHIP_PWMA "48304100.ecap" //ecap moves
 #define CHIP_PWMA "48302200.ehrpwm"
 #define ID_PWMA 0
 #define CHIP_PWMB "48302200.ehrpwm"
@@ -25,6 +23,10 @@
 #define M_RIGHT 0
 #define M_LEFT 1
 
+#define NUMPOLL 1
+
+
+
 int findPWM(char* whatPWM);
 
 FILE* ain1;
@@ -34,7 +36,11 @@ FILE* bin2;
 pwmAttr pwmA;
 pwmAttr pwmB;
 
+
 int main() {
+
+   mknod("/tmp/motorData", S_IFIFO, 0);
+   FILE* motorIn = fopen("/tmp/motorData", "r");
 
 	//Beagle init
    FILE* bbPinMux = fopen("/sys/devices/platform/ocp/ocp:P9_14_pinmux/state", "w");
@@ -61,13 +67,36 @@ int main() {
 	fprintf(pwmA.enable, "%s", "1");
 	fprintf(pwmB.enable, "%s", "1");
 
+/*
 	setMotor(M_RIGHT, FORWARD, 100);
 	sleep(1);
-	setMotor(M_RIGHT, OFF, 100);
-	sleep(1);
+	// setMotor(M_RIGHT, OFF, 100);
+ //   sleep(1);
 	setMotor(M_LEFT, FORWARD, 100);
 	sleep(1);
-	setMotor(M_LEFT, OFF, 100);
+	//setMotor(M_LEFT, OFF, 100);
+   if(ADC_VALUE_FRONT) {
+      setMotor(M_RIGHT, BRAKE, 100);
+      setMotor(M_LEFT, BRAKE, 100);
+   }*/
+
+   struct pollfd pfd[NUMPOLL];
+   int ret;
+   int fd;
+
+   pfd[0].fd = fd;   
+   pfd[0].events = POLLIN;
+
+   char databuf[1024] = "";
+
+   while(1) {
+      ret = poll(pfd, NUMPOLL, -1);
+      if((ret > 0) && (pfd[0].revents & POLLIN)) { //Something happened
+         read(fd, databuf, 1024);
+         printf("Motor Get: %s\n", databuf);
+      }
+   }
+
 
 	fclose(ain1);
 	fclose(ain2);

@@ -16,10 +16,31 @@
 #include <signal.h>
 #include <stdio.h>
 #include <sys/signalfd.h>
-#include <unistd.h>
 #include <string.h>
 
 #define NUMPOLL 2
+
+//ADC VALUES
+#define ADC_FRONT_THR
+#define ADC_LEFT_THR
+#define ADC_RIGHT_THR
+#define ADC_BACK_THR
+
+
+//Directions
+#define OFF 0
+#define FORWARD 1
+#define BACKWARD 2
+#define BRAKE 3
+
+//MOTORS
+#define M_RIGHT 0
+#define M_LEFT 1
+
+void setMotor(int whichMotor, int direction, int percent);
+void makeMotorDecision(void);
+
+FILE* motorOut;
 
 int main() {
 	printf("Control Program\n");
@@ -39,12 +60,18 @@ int main() {
 	int fd, fd2;
 	char* tok;
 
+	mknod("/tmp/motorData", S_IFIFO, 0);
+	motorOut = fopen("/tmp/motorData", "w");
+
 	fd = open("/tmp/adcData", O_RDONLY);
 	fd2 = open("/dev/ib", O_RDONLY); //fd2
+
    //FILE* fp2 = fopen("/dev/ib", "r");
    //fd2 = fileno(fp2);
 
 	//pfd[0].events = POLLIN | POLLERR | POLLHUP;
+
+
 
 	pfd[0].fd = fd;	
 	pfd[0].events = POLLIN;
@@ -66,10 +93,11 @@ int main() {
                i++;
                printf(" %s\n", tok);
                tok = strtok(NULL, ",\n");
-
-
-
             }
+
+            //temp
+            makeMotorDecision();
+
          }
          if (pfd[1].revents & POLLIN) {
             read(fd2, databuf, 2);
@@ -91,4 +119,12 @@ int main() {
 			printf("MOTOR\n");
 		}
 	}
+}
+
+void makeMotorDecision(void) {
+	setMotor(M_RIGHT, BRAKE, 100);
+}
+
+void setMotor(int whichMotor, int direction, int percent) {
+	fprintf(motorOut, "%d,%d,%d\n", whichMotor, direction, percent);
 }

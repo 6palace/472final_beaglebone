@@ -4,8 +4,8 @@
 #include "interrupt.h"
 
 //static unsigned int gpioLED = 74;       ///< hard coding the LED gpio for this example to P9_23 (GPIO49)
-static unsigned int gpioButton = 20;   ///< hard coding the button gpio for this example to P9_27 (GPIO115)
-static unsigned int gpioButton2 = 106;   ///< hard coding the button gpio for this example to P9_27 (GPIO115)
+static unsigned int gpioButton = 115;   ///< hard coding the button gpio for this example to P9_27 (GPIO115)
+static unsigned int gpioButton2 = 117;   ///< hard coding the button gpio for this example to P9_27 (GPIO115)
 static unsigned int irqNumber;          ///< Used to share the IRQ number within this file
 static unsigned int irqNumber2;          ///< Used to share the IRQ number within this file
 

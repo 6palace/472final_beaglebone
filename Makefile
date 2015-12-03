@@ -31,7 +31,7 @@ mainprog: main.c
 	arm-linux-gnueabihf-gcc main.c -std=gnu99 -g -o control -lrt
 
 adcprog: adc.c adc.h
-	arm-linux-gnueabihf-gcc adc.c -std=gnu99 -g -o adc -lrt  -mfloat-abi=hard
+	arm-linux-gnueabihf-gcc adc.c -std=gnu99 -g -o adc -lrt
 
 moprog: motor.c
 	arm-linux-gnueabihf-gcc motor.c -std=gnu99 -g -o motor -lrt
