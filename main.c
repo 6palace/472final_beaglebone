@@ -40,8 +40,6 @@
 void setMotor(int whichMotor, int direction, int percent);
 void makeMotorDecision(void);
 
-FILE* motorOut;
-
 int main() {
 	printf("Control Program\n");
 
@@ -60,8 +58,7 @@ int main() {
 	int fd, fd2;
 	char* tok;
 
-	mknod("/tmp/motorData", S_IFIFO, 0);
-	motorOut = fopen("/tmp/motorData", "w");
+	
 
 	fd = open("/tmp/adcData", O_RDONLY);
 	fd2 = open("/dev/ib", O_RDONLY); //fd2
@@ -122,9 +119,14 @@ int main() {
 }
 
 void makeMotorDecision(void) {
-	setMotor(M_RIGHT, BRAKE, 100);
+	setMotor(M_RIGHT, FORWARD, 100);
+	sleep(1);
+	setMotor(M_RIGHT, OFF, 100);
 }
 
 void setMotor(int whichMotor, int direction, int percent) {
+	printf("setmoto\n");
+	FILE* motorOut = fopen("/tmp/motorData", "w");
 	fprintf(motorOut, "%d,%d,%d\n", whichMotor, direction, percent);
+	fclose(motorOut);
 }

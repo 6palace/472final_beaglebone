@@ -13,7 +13,7 @@
 #define CHIP_PWMB "48302200.ehrpwm"
 #define ID_PWMB 1
 
-//DirectionsE
+//Directions
 #define OFF 0
 #define FORWARD 1
 #define BACKWARD 2
@@ -40,7 +40,6 @@ pwmAttr pwmB;
 int main() {
 
    mknod("/tmp/motorData", S_IFIFO, 0);
-   FILE* motorIn = fopen("/tmp/motorData", "r");
 
 	//Beagle init
    FILE* bbPinMux = fopen("/sys/devices/platform/ocp/ocp:P9_14_pinmux/state", "w");
@@ -66,24 +65,24 @@ int main() {
 
 	fprintf(pwmA.enable, "%s", "1");
 	fprintf(pwmB.enable, "%s", "1");
+   fclose(pwmA.enable);
+   fclose(pwmB.enable);
 
-/*
-	setMotor(M_RIGHT, FORWARD, 100);
+
+	/*setMotor(M_RIGHT, FORWARD, 100);
 	sleep(1);
-	// setMotor(M_RIGHT, OFF, 100);
- //   sleep(1);
+	setMotor(M_RIGHT, OFF, 100);
+    sleep(1);
 	setMotor(M_LEFT, FORWARD, 100);
 	sleep(1);
-	//setMotor(M_LEFT, OFF, 100);
-   if(ADC_VALUE_FRONT) {
-      setMotor(M_RIGHT, BRAKE, 100);
-      setMotor(M_LEFT, BRAKE, 100);
-   }*/
+	setMotor(M_LEFT, OFF, 100);*/
 
    struct pollfd pfd[NUMPOLL];
    int ret;
    int fd;
+   char* tok;
 
+   fd = open("/tmp/motorData", O_RDONLY);
    pfd[0].fd = fd;   
    pfd[0].events = POLLIN;
 
@@ -93,10 +92,13 @@ int main() {
       ret = poll(pfd, NUMPOLL, -1);
       if((ret > 0) && (pfd[0].revents & POLLIN)) { //Something happened
          read(fd, databuf, 1024);
+         int argVal[3];
+         sscanf(databuf, "%d,%d,%d\n", &argVal[0], &argVal[1], &argVal[2]);
          printf("Motor Get: %s\n", databuf);
+         printf("Motor Get: %d m %d m %d\n", argVal[0], argVal[1], argVal[2]);
+         setMotor(argVal[0], argVal[1], argVal[2]);
       }
    }
-
 
 	fclose(ain1);
 	fclose(ain2);
@@ -120,7 +122,8 @@ int findPWM(char* whatPWM) {
 }
 
 void setMotor(int whichMotor, int direction, int percent) {
-	
+	printf("!!!!%d, %d, %d", whichMotor, direction, percent);
+
 	FILE* in1;
 	FILE* in2;
 	pwmAttr pwm;
@@ -217,7 +220,8 @@ pwmAttr initPWM(int chipNum, int subID) {
 	attrib.duty_cycle = fopen(dutyC, "w");
 
 	char enableC[256];
-	sprintf (enableC, "/sys/class/pwm/pwmchip%d/pwm%d/enable", chipNum, subID);
+   sprintf (enableC, "/sys/class/pwm/pwmchip%d/pwm%d/enable", chipNum, subID);
+	printf ("/sys/class/pwm/pwmchip%d/pwm%d/enable\n", chipNum, subID);
 	attrib.enable = fopen(enableC, "w");
 
 	return attrib;
