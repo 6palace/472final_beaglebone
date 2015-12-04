@@ -74,6 +74,7 @@ ssize_t device_read(struct file*, char*, size_t, loff_t*);
 // Called when user wants to send info to device
 ssize_t device_write(struct file*, const char*, size_t, loff_t*);
 
+// used for user-space polling
 int device_poll(struct file* filp , poll_table * pwait);
 
 /* operations usable by this file. */
