@@ -27,7 +27,7 @@ int main() {
    printf("setup complete\n");
 
    mknod("/tmp/adcData", S_IFIFO, 0);
-   adcOut = fopen("/tmp/adcData", "w");
+   
 
    struct sigevent    sigx;
    struct sigaction   sigAct;
@@ -47,7 +47,7 @@ int main() {
    newTime.it_value.tv_sec     = 0; 
    newTime.it_value.tv_nsec    = 1;
    newTime.it_interval.tv_sec  = 0;
-   newTime.it_interval.tv_nsec = 1000000;
+   newTime.it_interval.tv_nsec = 100000000;
 
    timer_create(CLOCK_REALTIME, &sigx, &timer);
    timer_settime(timer, 0,  &newTime, NULL);
@@ -67,9 +67,13 @@ int readADC(int whichADC) {
 	gpio = fopen(valueLoc, "r");
 	fscanf(gpio, "%d", &adcVal);
 	fclose(gpio);
+   //printf("readadc %d val:%d\n", whichADC, adcVal);
 	return adcVal;
 }
 
 void timeHandler(int sigNo, siginfo_t * evp, void * ucontext) {
+   adcOut = fopen("/tmp/adcData", "w");
    fprintf(adcOut, "%d,%d,%d,%d\n", readADC(0), readADC(1), readADC(2), readADC(3));
+   fclose(adcOut);
+   //printf("timea\n");
 }

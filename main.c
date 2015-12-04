@@ -93,7 +93,7 @@ int main() {
             }
 
             //temp
-            makeMotorDecision();
+           // makeMotorDecision();
 
          }
          if (pfd[1].revents & POLLIN) {
@@ -119,13 +119,13 @@ int main() {
 }
 
 void makeMotorDecision(void) {
-	setMotor(M_RIGHT, FORWARD, 100);
-	sleep(1);
+	//setMotor(M_RIGHT, FORWARD, 100);
+	//sleep(1);
 	setMotor(M_RIGHT, OFF, 100);
 }
 
 void setMotor(int whichMotor, int direction, int percent) {
-	printf("setmoto\n");
+	//printf("setmoto\n");
 	FILE* motorOut = fopen("/tmp/motorData", "w");
 	fprintf(motorOut, "%d,%d,%d\n", whichMotor, direction, percent);
 	fclose(motorOut);

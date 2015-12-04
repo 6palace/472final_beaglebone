@@ -122,7 +122,7 @@ int findPWM(char* whatPWM) {
 }
 
 void setMotor(int whichMotor, int direction, int percent) {
-	printf("!!!!%d, %d, %d", whichMotor, direction, percent);
+	//printf("!!!!%d, %d, %d", whichMotor, direction, percent);
 
 	FILE* in1;
 	FILE* in2;
