@@ -87,7 +87,7 @@ typedef struct CarState {
 //initialize state to full forward, create action pointer values
 void initCarState(CarState* state){
 	state->state = 0;
-	state->actions[0] = cmdCarLeftFull;
+	state->actions[0] = cmdCarFwdFull;
 	state->actions[1] = cmdCarRightFull;
     state->actions[state->state]();
 }
