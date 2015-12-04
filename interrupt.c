@@ -5,7 +5,7 @@
 
 //static unsigned int gpioLED = 74;       ///< hard coding the LED gpio for this example to P9_23 (GPIO49)
 static unsigned int gpioButton = 115;   ///< hard coding the button gpio for this example to P9_27 (GPIO115)
-static unsigned int gpioButton2 = 117;   ///< hard coding the button gpio for this example to P9_27 (GPIO115)
+static unsigned int gpioButton2 = 117;   ///< hard coding the button gpio for this example to P9_25 (GPIO117)
 static unsigned int irqNumber;          ///< Used to share the IRQ number within this file
 static unsigned int irqNumber2;          ///< Used to share the IRQ number within this file
 
@@ -140,9 +140,9 @@ ssize_t device_read(struct file* filp, char* bufStoreData,
    //wait_event_interruptible(wq, virtual_device.interruptWaiting == 1);
 
    if (virtual_device.button)
-      buttonStr = "1";
+      buttonStr = "1\n";
    else
-      buttonStr = "0";
+      buttonStr = "0\n";
    virtual_device.interruptWaiting = 0;
    ret = copy_to_user(bufStoreData, buttonStr, strlen(buttonStr)+1);
    //*curOffset += strlen(buttonStr);

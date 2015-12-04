@@ -93,10 +93,20 @@ int main() {
       if((ret > 0) && (pfd[0].revents & POLLIN)) { //Something happened
          read(fd, databuf, 1024);
          int argVal[3];
-         sscanf(databuf, "%d,%d,%d\n", &argVal[0], &argVal[1], &argVal[2]);
+         // sscanf(databuf, "%d,%d,%d\n", &argVal[0], &argVal[1], &argVal[2]);
          printf("Motor Get: %s\n", databuf);
-         printf("Motor Get: %d m %d m %d\n", argVal[0], argVal[1], argVal[2]);
-         setMotor(argVal[0], argVal[1], argVal[2]);
+         tok = strtok(databuf, "\n");
+         while(tok != NULL) 
+         {
+            sscanf(tok, "%d,%d,%d", &argVal[0], &argVal[1], &argVal[2]);
+            printf("raw : %s", tok);
+            printf("Motor Get: %d m %d m %d\n", argVal[0], argVal[1], argVal[2]);
+            setMotor(argVal[0], argVal[1], argVal[2]);
+            // printf(" %d\n", adcVals[i]);
+            tok = strtok(NULL, "\n");
+         }
+         // printf("Motor Get: %d m %d m %d\n", argVal[0], argVal[1], argVal[2]);
+         // setMotor(argVal[0], argVal[1], argVal[2]);
       }
    }
 
