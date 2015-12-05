@@ -1,4 +1,5 @@
 //motor.c
+//EE472 Group F Lab 3
 
 #include "motor.h"
 

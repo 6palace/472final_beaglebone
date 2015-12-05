@@ -1,4 +1,5 @@
 //adc.c
+//EE472 Group F Lab 3
 
 #include "adc.h"      
 int main() {

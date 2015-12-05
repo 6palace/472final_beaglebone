@@ -1,4 +1,6 @@
 //motor.h
+//EE472 Group F Lab 3
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>

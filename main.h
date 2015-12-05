@@ -1,4 +1,5 @@
 
+//EE472 Group F Lab 3
 #ifndef MOTOR_ADC_MAIN_H_
 #define MOTOR_ADC_MAIN_H_
    #include <stdio.h>
