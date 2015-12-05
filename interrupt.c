@@ -129,15 +129,9 @@ ssize_t device_read(struct file* filp, char* bufStoreData,
    int ret;
    char* buttonStr ;
 
-  // printk("offset is at %d\n", *curOffset);
-   /*if(*curOffset > 0)  {
-      *curOffset = 0;
-      return 0;
-   } */if(!virtual_device.interruptWaiting)  {
+   if(!virtual_device.interruptWaiting)  {
       return 0;
    }
-
-   //wait_event_interruptible(wq, virtual_device.interruptWaiting == 1);
 
    if (virtual_device.button)
       buttonStr = "1\n";
@@ -145,14 +139,13 @@ ssize_t device_read(struct file* filp, char* bufStoreData,
       buttonStr = "0\n";
    virtual_device.interruptWaiting = 0;
    ret = copy_to_user(bufStoreData, buttonStr, strlen(buttonStr)+1);
-   //*curOffset += strlen(buttonStr);
+ 
    
    return strlen(buttonStr);   
 }
 
-int device_poll(struct file* filp , poll_table* wait) {
+unsigned int device_poll(struct file* filp , poll_table* wait) {
    unsigned int mask;
-   //printk("Poll was called\n");
 
    poll_wait(filp, &wq, wait);
 
@@ -162,7 +155,6 @@ int device_poll(struct file* filp , poll_table* wait) {
 
    return mask;
 }
-
 
 ssize_t device_write(struct file* filp, const char* bufSource,
    size_t bufLength, loff_t* curOffset) {

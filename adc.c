@@ -1,20 +1,6 @@
 //adc.c
 
 #include "adc.h"      
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <time.h>
-#include <signal.h>
-#include <stdlib.h>
-
-#define TIMER_TAG 263 //Unique number for timer signal identifier
-
-void timeHandler(int sigNo, siginfo_t * evp, void * ucontext);
-
-FILE* adcOut;
-
 int main() {
 
    //init adc beaglebone
@@ -26,7 +12,6 @@ int main() {
 
    printf("setup complete\n");
 
-   mknod("/tmp/adcData", S_IFIFO, 0);
    
 
    struct sigevent    sigx;
@@ -39,13 +24,15 @@ int main() {
    sigAct.sa_handler = (void (*))timeHandler;
    sigaction(SIGUSR1, &sigAct, 0);
 
+
+   // printf("signal setup\n");
+
    sigx.sigev_notify          = SIGEV_SIGNAL;
    sigx.sigev_signo           = SIGUSR1;
    sigx.sigev_value.sival_int = TIMER_TAG;
 
-   //expires in 1 second and every 3 seconds after
-   newTime.it_value.tv_sec     = 0; 
-   newTime.it_value.tv_nsec    = 1;
+   newTime.it_value.tv_sec     = 1; 
+   newTime.it_value.tv_nsec    = 2;
    newTime.it_interval.tv_sec  = 0;
    newTime.it_interval.tv_nsec = 100000000;
 
@@ -59,7 +46,8 @@ int main() {
 }
 
 
-int readADC(int whichADC) {
+static int readADC(int whichADC) {
+   // printf("readADC\n");
 	FILE* gpio;
 	int adcVal;
 	char valueLoc[256];
@@ -67,13 +55,12 @@ int readADC(int whichADC) {
 	gpio = fopen(valueLoc, "r");
 	fscanf(gpio, "%d", &adcVal);
 	fclose(gpio);
-   printf("readadc %d val:%d\n", whichADC, adcVal);
 	return adcVal;
 }
 
-void timeHandler(int sigNo, siginfo_t * evp, void * ucontext) {
+static void timeHandler(int sigNo, siginfo_t * evp, void * ucontext) {
+   // printf("timeHandler\n");
    adcOut = fopen("/tmp/adcData", "w");
    fprintf(adcOut, "%d,%d,%d,%d\n", readADC(0), readADC(1), readADC(2), readADC(3));
    fclose(adcOut);
-   //printf("timea\n");
 }

@@ -11,18 +11,19 @@
 
 //property struct for pwm
 typedef struct pwmAttributes {
-	FILE* period;
-	FILE* duty_cycle;
-	FILE* enable;
+   FILE* period;
+   FILE* duty_cycle;
+   FILE* enable;
 } pwmAttr;
 
 //gpio device operations
-void setGPIO(FILE* loc, int toSet);
-FILE* initGPIO(int gpioNum);
+static void setGPIO(FILE* loc, int toSet);
+static FILE* initGPIO(int gpioNum);
 
-pwmAttr initPWM(int chipNum, int subID);
+//sets up pwm in file system and links pwm attributes
+static pwmAttr initPWM(int chipNum, int subID);
 
 //updates pwm duty attributes depending on given percent
-void motorSpeed(pwmAttr pwm, int percent);
+static void motorSpeed(pwmAttr pwm, int percent);
 //controls specified motor
-void setMotor(int whichMotor, int direction, int percent);
+static void setMotor(int whichMotor, int direction, int percent);
