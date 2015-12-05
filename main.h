@@ -40,7 +40,7 @@
 	typedef struct CarState {
 		int state;
 		int oldstate;
-		void (* actions[2])(void);
+		void (* actions[10])(void);
 	} CarState;
 
 	//Function handles that are pointed to by the carstate, predefine movement patterns

@@ -1,11 +1,25 @@
 
 #include "main.h"
 
+
+
+	//Function handles that are pointed to by the carstate, predefine movement patterns
+	void cmdCarFwdFull(void);
+	void cmdCarStop(void);
+	//turn in place
+	void cmdCarLeftFull(void);
+	void cmdCarRightFull(void);
+	//smoorth turn
+	void cmdCarLeftFwd(void);
+	void cmdCarRightFwd(void);
+
 //initialize state to full forward, create action pointer values
 void initCarState(CarState* state){
 	state->state = 0;
 	state->actions[0] = cmdCarFwdFull;
 	state->actions[1] = cmdCarRightFull;
+	state->actions[2] = cmdCarRightFwd;
+	state->actions[3] = cmdCarLeftFwd;
     state->actions[state->state]();
 }
 
@@ -14,7 +28,13 @@ void updateCarState(CarState* state, int adcVals[4]){
 	if(adcVals[2] > 1600){
 		state->state = 1;
 	} else{
-		state->state = 0;
+		if(adcVals[1] > 1600){
+			state->state = 2;
+		} else if(adcVals[3] > 1600){
+			state->state = 3;
+		} else{
+			state->state = 0;
+		}
 	}
 }
 
@@ -86,7 +106,9 @@ int main() {
                i++;
             }
 
+            //detect change in car state, send new commands down pipe
             updateCarState(&cs, adcVals);
+            printf("curState: %d\n", cs.state);
 			if(cs.state != cs.oldstate){
 				printf("new state: %d\n", cs.state);
 				cs.actions[cs.state]();
@@ -123,7 +145,7 @@ void setMotor(int whichMotor, int direction, int percent) {
 	FILE* motorOut = fopen("/tmp/motorData", "w");
 	fprintf(motorOut, "%d,%d,%d\n", whichMotor, direction, percent);
 	printf("To Motor: %d,%d,%d\n", whichMotor, direction, percent);
-	fflush(motorOut);
+	//fflush(motorOut);
 	fclose(motorOut);
 }
 
@@ -141,21 +163,25 @@ void cmdCarStop(void){
 }
 
 void cmdCarLeftFull(void){
+		printf("Car rotate left!\n");
 		setMotor(M_RIGHT, FORWARD, 100);
 		setMotor(M_LEFT, BACKWARD, 100);
 }
 
 void cmdCarLeftFwd(void){
+		printf("Car sweep left!\n");
 		setMotor(M_RIGHT, FORWARD, 100);
 		setMotor(M_LEFT, FORWARD, 20);
 }
 
 void cmdCarRightFull(void){
+		printf("Car rotate right!\n");
 		setMotor(M_RIGHT, BACKWARD, 100);
 		setMotor(M_LEFT, FORWARD, 100);
 }
 
 void cmdCarRightFwd(void){
+		printf("Car sweep right!\n");
 		setMotor(M_RIGHT, FORWARD, 20);
 		setMotor(M_LEFT, FORWARD, 100);
 }

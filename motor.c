@@ -94,12 +94,12 @@ int main() {
          read(fd, databuf, 1024);
          int argVal[3];
          // sscanf(databuf, "%d,%d,%d\n", &argVal[0], &argVal[1], &argVal[2]);
-         printf("Motor Get: %s\n", databuf);
+         // printf("Motor Get: %s\n", databuf);
          tok = strtok(databuf, "\n");
          while(tok != NULL) 
          {
             sscanf(tok, "%d,%d,%d", &argVal[0], &argVal[1], &argVal[2]);
-            printf("raw : %s", tok);
+            // printf("raw : %s", tok);
             printf("Motor Get: %d m %d m %d\n", argVal[0], argVal[1], argVal[2]);
             setMotor(argVal[0], argVal[1], argVal[2]);
             // printf(" %d\n", adcVals[i]);
@@ -172,7 +172,7 @@ void setMotor(int whichMotor, int direction, int percent) {
 
 
 void motorSpeed(pwmAttr pwm, int percent) {
-	int period = 100;
+	int period = 10000; //10kHz
 	fprintf(pwm.period, "%d", period);
 	fprintf(pwm.duty_cycle, "%d", period*(percent/100));
 	fflush(pwm.period);

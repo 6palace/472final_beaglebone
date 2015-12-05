@@ -67,7 +67,7 @@ int readADC(int whichADC) {
 	gpio = fopen(valueLoc, "r");
 	fscanf(gpio, "%d", &adcVal);
 	fclose(gpio);
-   //printf("readadc %d val:%d\n", whichADC, adcVal);
+   printf("readadc %d val:%d\n", whichADC, adcVal);
 	return adcVal;
 }
 
