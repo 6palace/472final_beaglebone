@@ -1,0 +1,1 @@
+cmd_/home/station02/Lab4/srmod.ko := arm-linux-gnueabihf-ld -EL -r  -T ./scripts/module-common.lds --build-id  -o /home/station02/Lab4/srmod.ko /home/station02/Lab4/srmod.o /home/station02/Lab4/srmod.mod.o

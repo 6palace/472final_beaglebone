@@ -36,6 +36,9 @@ adcprog: adc.c adc.h
 moprog: motor.c
 	arm-linux-gnueabihf-gcc motor.c -std=gnu99 -g -o motor -lrt
 
+i2cprog: i2c.c
+	arm-linux-gnueabihf-gcc i2c.c -std=gnu99 -g -o i2c -lrt	
+
 #butprog: interrupt_test.c
 #	arm-linux-gnueabihf-gcc interrupt_test.c -std=gnu99 -g -o interrupt_test -lrt
 
@@ -43,6 +46,7 @@ uploadrun:
 	scp adc root@192.168.7.2:~
 	scp motor root@192.168.7.2:~
 	scp control root@192.168.7.2:~
+	scp i2c root@192.168.7.2:~
 	#sshpass -p 'temppwd' scp interrupt_test root@192.168.7.2:~
 	scp *.ko root@192.168.7.2:~
 	scp reloadModule.sh root@192.168.7.2:~
