@@ -69,19 +69,22 @@ int main(void)
 
 
 u_int16_t rawDataCollect(char* high, char* low, int i2cHandle) {
+  printf("High: %s\n", high);
+  printf("Low: %s\n", low);
   char txBuffer[32]; 
   char rxBuffer[32]; 
   memset(txBuffer, 0, sizeof(txBuffer));
   memset(rxBuffer, 0, sizeof(rxBuffer));
   u_int16_t concat_data = 0;
-  txBuffer[0] = *high; // This is the address we want to read from.
-  //printf("txBuffer value: %d", txBuffer);
+  txBuffer[0] = 0x41; // This is the address we want to read from.
+  printf("txBuffer value: %d\n", txBuffer[0]);
   write(i2cHandle, txBuffer, 1);
   read(i2cHandle, rxBuffer, 1);
+  printf("rxBuffer data: %s\n", rxBuffer);
   concat_data = (u_int16_t)* rxBuffer;
   printf("concat_data value: %d\n", concat_data);
 
-  txBuffer[0] = *low; // This is the address we want to read from.
+  txBuffer[0] = 0x42; // This is the address we want to read from.
   write(i2cHandle, txBuffer, 1);
   read(i2cHandle, rxBuffer, 1);
   concat_data = (concat_data << 8);
