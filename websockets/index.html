@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Websockets</title>
+</head>
+
+<body id="home">
+	Websockets! 
+	<button onclick="sendMessage('uno')">One</button><button onclick="sendMessage('dos')">two</button>
+	
+	<script>
+	function sendMessage(msg){
+		waitForSocketConnection(ws, function(){
+			ws.send(msg);
+		});
+	}
+
+	function waitForSocketConnection(socket, callback){
+		setTimeout(
+			function () {
+				if (socket.readyState === 1) {
+					if(callback != null){
+						callback();
+					}
+					return;
+				} else {
+					waitForSocketConnection(socket, callback);
+				}
+
+			}, 5);
+	}
+	
+	var ws = new WebSocket('ws://' + window.location.hostname + ':9000', 'robot-cmd-protocol');
+	ws.onmessage = function(evt) { alert( "Received Message: " + evt.data); }; //TODO: onopen onerror
+	sendMessage("This is a test.");
+	//myWebSocket.close();
+	</script>
+</body>
+</html>
