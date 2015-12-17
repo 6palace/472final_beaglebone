@@ -18,7 +18,6 @@
    #include <stdio.h>
    #include <sys/signalfd.h>
    #include <string.h>
-   #include <pthread.h>
 
    //listening for adc or button interrupts, poll isnt' actually polling
    #define NUMPOLL 4

@@ -13,13 +13,11 @@ int main() {
    system("rm /tmp/adcData");
    system("rm /tmp/motorData");
    system("rm /tmp/fromWebsocket");
-   system("rm /tmp/toWebsocket");
    system("rm /tmp/i2cData");
    mknod("/tmp/adcData", S_IFIFO, 0);
    mknod("/tmp/motorData", S_IFIFO, 0);
    mknod("/tmp/fromWebsocket", S_IFIFO, 0);
-   mknod("/tmp/toWebsocket", S_IFIFO, 0);
-   mknod("/tmp/i2cData", S_IFIFO, 0);
+      mknod("/tmp/i2cData", S_IFIFO, 0);
 
    //pthread_sem_name_init(&lock, NULL);
    sem_init(&sem_name, 0, 1);

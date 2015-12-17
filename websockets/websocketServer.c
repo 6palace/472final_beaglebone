@@ -4,6 +4,8 @@
 #include <string.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include "./libwebsockets/lib/libwebsockets.h"
 
 
@@ -47,6 +49,10 @@ int main(void) {
 
 	struct lws_context_creation_info info;
 
+
+   	system("rm /tmp/toWebsocket");
+   mknod("/tmp/toWebsocket", S_IFIFO, 0);
+
 	memset(&info, 0, sizeof info);
 	info.port = port;
 	info.iface = interface;
@@ -76,6 +82,7 @@ int main(void) {
 		//libwebsocket_service(context, 50);
 		char databuf[1024] = "";
 		libwebsocket_service(context, 50); //set to 0ms on single threaded app according to https://libwebsockets.org/libwebsockets-api-doc.html
+		printf("anded: %d\n", mask & O_NONBLOCK == O_NONBLOCK);
 		//do more single threaded stuff here
 		ssize_t r = read(fd, databuf, 100);
 		if (r == -1 && errno == EAGAIN){
