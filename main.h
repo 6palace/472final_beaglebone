@@ -18,9 +18,10 @@
    #include <stdio.h>
    #include <sys/signalfd.h>
    #include <string.h>
+   #include <pthread.h>
 
    //listening for adc or button interrupts, poll isnt' actually polling
-   #define NUMPOLL 2
+   #define NUMPOLL 3
 
    //Directions
    #define OFF 0
@@ -41,6 +42,7 @@
       int state;
       int oldstate;
       void (* actions[10])(void);
+      int autoMode;
    } CarState;
 
    //Function handles that are pointed to by the carstate, predefine movement patterns
@@ -52,7 +54,12 @@
    //smooth turn
    static void cmdCarLeftFwd(void);
    static void cmdCarRightFwd(void);
+   static void cmdCarBackFull(void);
+
+   static void initCarState(CarState* state);
+   static void updateCarState(CarState* state, int adcVals[4]);
+   static void refreshCarState(CarState* state);
 
    //send motor command down pipe to motor process
-   static void setMotor(int whichMotor, int direction, int percent);
+   static void setMotor(int direction, int percent, int direction2, int percent2);
 #endif

@@ -28,7 +28,7 @@ clean:
 doall: default mainprog adcprog moprog uploadrun
 
 mainprog: main.c
-	arm-linux-gnueabihf-gcc main.c -std=gnu99 -g -o control -lrt
+	arm-linux-gnueabihf-gcc main.c -std=gnu99 -g -o control -lrt -pthread
 
 adcprog: adc.c adc.h
 	arm-linux-gnueabihf-gcc adc.c -std=gnu99 -g -o adc -lrt

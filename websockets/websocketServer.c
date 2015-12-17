@@ -4,6 +4,7 @@
 #include <string.h>
 #include "./libwebsockets/lib/libwebsockets.h"
 
+
 static int callback_http(struct libwebsocket_context * this,
 								 struct libwebsocket *wsi,
 								 enum libwebsocket_callback_reasons reason, void *user,
@@ -39,7 +40,7 @@ int main(void) {
 	const char *cert_path = NULL;
 	const char *key_path = NULL;
 	int opts = 0;
-   
+
 	struct lws_context_creation_info info;
 
 	memset(&info, 0, sizeof info);
@@ -95,6 +96,12 @@ static int callback_robot_cmd(struct libwebsocket_context * this,
 		case LWS_CALLBACK_RECEIVE:
 			//From documentation: data has appeared for the server, it can be found at *in and is len bytes long 
 			printf("Data Recieved: %s\n", (char*)in);
+
+
+			FILE* fwsOut = fopen("/tmp/fromWebsocket", "w");
+			fprintf(fwsOut, "%s\n", in);
+			fclose(fwsOut);
+
 
 			//send something back
 			libwebsocket_callback_on_writable(this, wsi); //call this to get a LWS_CALLBACK_SERVER_WRITEABLE

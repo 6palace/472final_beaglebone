@@ -1,1 +1,0 @@
-cmd_/home/station02/Lab4/lcdmod.ko := arm-linux-gnueabihf-ld -EL -r  -T ./scripts/module-common.lds --build-id  -o /home/station02/Lab4/lcdmod.ko /home/station02/Lab4/lcdmod.o /home/station02/Lab4/lcdmod.mod.o
