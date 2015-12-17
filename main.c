@@ -64,14 +64,13 @@ int main() {
    long turnOffset = 0;
    int areWeGoingForward = 0;
    while(1) {
-
+      usleep(20);
       char databuf[1024] = "";
       ret = poll(pfd, NUMPOLL, -1);
       if(ret > 0) { //Something happened
          if (pfd[0].revents & POLLIN) {
+            read(fd, databuf, 1024);
             if (cs.autoMode) {
-               printf("ADC stored:\n");
-               read(fd, databuf, 1024);
                tok = strtok(databuf, ",\n");
                int i = 0;
                while(i < 4 && tok != NULL) 
@@ -105,7 +104,7 @@ int main() {
          }
 
          if (pfd[2].revents & POLLIN) {
-            read(fd3, databuf, 1000); //TODO FIX CHARS
+            read(fd3, databuf, 400); //TODO FIX CHARS
             tok = strtok(databuf, ",\n");
             printf("Bwebsockin %s\n", tok);
             if(!strcmp(tok, "TANKFW")) {
@@ -132,7 +131,6 @@ int main() {
          }
 
           if (pfd[3].revents & POLLIN) {
-
              FILE* toWebsocket = fopen("/tmp/toWebsocket", "w");
              read(fd4, databuf, 20);
              printf("i2C: %s\n", databuf);
