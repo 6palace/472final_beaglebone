@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <fcntl.h>
+#include <errno.h>
 #include "./libwebsockets/lib/libwebsockets.h"
 
 
@@ -41,6 +43,7 @@ int main(void) {
 	const char *cert_path = NULL;
 	const char *key_path = NULL;
 	int opts = 0;
+	int fd;
 
 	struct lws_context_creation_info info;
 
@@ -63,11 +66,29 @@ int main(void) {
    
 	printf("Server Started.\n");
 
+
+   fd = open("/tmp/toWebsocket", O_RDONLY | O_NONBLOCK);
+   fcntl(fd, F_SETFL, O_NONBLOCK);
+
+   int mask = fcntl(fd, F_GETFL);
+
 	while (1) {
 		//libwebsocket_service(context, 50);
+		char databuf[1024] = "";
 		libwebsocket_service(context, 50); //set to 0ms on single threaded app according to https://libwebsockets.org/libwebsockets-api-doc.html
-
 		//do more single threaded stuff here
+		ssize_t r = read(fd, databuf, 100);
+		if (r == -1 && errno == EAGAIN){
+		    // no data yet
+		    printf("errno is EAGAIN\n");
+		} else if (r > 0){
+		    // received data
+		    // take databuf and process it
+		    printf("recieved temp info\n");
+		} else{
+			//closed pipe
+			printf("closed pipe\n");
+		}
 
 
 	}

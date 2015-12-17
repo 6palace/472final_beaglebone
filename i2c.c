@@ -108,7 +108,7 @@ static double convert_tempr(void) {
   raw_temp = rawDataCollect(high_values[3], low_values[3], i2cHandle);
 
   convert_temp = (twoConvert(raw_temp)/340.0 + 32.25);
-  //printf("Temperature: %f Celsius\n", convert_temp);
+  printf("Temperature: %f Celsius\n", convert_temp);
   
   return convert_temp;
 }

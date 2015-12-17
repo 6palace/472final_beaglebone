@@ -13,10 +13,12 @@ int main() {
    system("rm /tmp/adcData");
    system("rm /tmp/motorData");
    system("rm /tmp/fromWebsocket");
+   system("rm /tmp/toWebsocket");
    system("rm /tmp/i2cData");
    mknod("/tmp/adcData", S_IFIFO, 0);
    mknod("/tmp/motorData", S_IFIFO, 0);
    mknod("/tmp/fromWebsocket", S_IFIFO, 0);
+   mknod("/tmp/toWebsocket", S_IFIFO, 0);
    mknod("/tmp/i2cData", S_IFIFO, 0);
 
    //pthread_sem_name_init(&lock, NULL);
@@ -46,6 +48,8 @@ int main() {
    pfd[2].events = POLLIN;
    pfd[3].fd = fd4;
    pfd[3].events = POLLIN;
+
+
 
    
 
@@ -103,7 +107,7 @@ int main() {
          }
 
          if (pfd[2].revents & POLLIN) {
-            read(fd3, databuf, 100); //TODO FIX CHARS
+            read(fd3, databuf, 1000); //TODO FIX CHARS
             tok = strtok(databuf, ",\n");
             printf("Bwebsockin %s\n", tok);
             if(!strcmp(tok, "TANKFW")) {
@@ -125,17 +129,24 @@ int main() {
                char* pend;
                turnOffset = strtol(tok+pmatch[1].rm_so, &pend, 10);
                cmdCarFwdFull(turnOffset);
-            } 
+            }
             
          }
 
           if (pfd[3].revents & POLLIN) {
-             read(fd4, databuf, 100);
+
+             FILE* toWebsocket = fopen("/tmp/toWebsocket", "w");
+             read(fd4, databuf, 20);
              printf("i2C: %s\n", databuf);
+             fprintf(toWebsocket, "%s\n", databuf);
+             fflush(toWebsocket);
+
+             fclose(toWebsocket);
           }
       }
    }
    //END MAIN PROGRAM
+
    } else {
       //launch child processes
       pid_t pid2 = fork(); 

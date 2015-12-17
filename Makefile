@@ -25,7 +25,7 @@ default:
 clean:
 	$(MAKE) -C $(KDIR) SUBDIRS=$(PWD) clean
 
-doall: default mainprog adcprog moprog uploadrun
+doall: default mainprog adcprog moprog i2cprog uploadrun
 
 mainprog: main.c
 	arm-linux-gnueabihf-gcc main.c -std=gnu99 -g -o control -lrt -pthread
