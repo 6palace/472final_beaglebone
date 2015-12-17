@@ -1,6 +1,7 @@
 //EE472 Group F Lab 3
 #include "main.h"
 #include <semaphore.h>
+#include <regex.h>
 //pthread_t tid[2];
 //int counter;
 //pthread_sem_name_t lock;
@@ -12,9 +13,11 @@ int main() {
    system("rm /tmp/adcData");
    system("rm /tmp/motorData");
    system("rm /tmp/fromWebsocket");
+   system("rm /tmp/i2cData");
    mknod("/tmp/adcData", S_IFIFO, 0);
    mknod("/tmp/motorData", S_IFIFO, 0);
    mknod("/tmp/fromWebsocket", S_IFIFO, 0);
+   mknod("/tmp/i2cData", S_IFIFO, 0);
 
    //pthread_sem_name_init(&lock, NULL);
    sem_init(&sem_name, 0, 1);
@@ -28,21 +31,21 @@ int main() {
    struct pollfd pfd[NUMPOLL];
    int ret;
    ssize_t bytes;
-   int fd, fd2, fd3;
+   int fd, fd2, fd3, fd4;
    char* tok;
    int motorflag;
-
    fd = open("/tmp/adcData", O_RDONLY);
    fd2 = open("/dev/ib", O_RDONLY);
-   //fd3 = open("/tmp/toWebsocket", O_RDONLY);
-   fd3 = open("/tmp/fromWebsocket", O_RDONLY );
-
+   fd3 = open("/tmp/fromWebsocket", O_RDWR);
+   fd4 = open("/tmp/i2cData", O_RDWR);
    pfd[0].fd = fd;   
    pfd[0].events = POLLIN;
    pfd[1].fd = fd2;
    pfd[1].events = POLLIN;
    pfd[2].fd = fd3;
    pfd[2].events = POLLIN;
+   pfd[3].fd = fd4;
+   pfd[3].events = POLLIN;
 
    
 
@@ -51,7 +54,15 @@ int main() {
     CarState cs;
     initCarState(&cs);
 
+   regex_t ttregex;
+   regcomp(&ttregex, "^TANKTURN:([-]?[0-9][0-9]?[0-9]?)$", REG_EXTENDED);
+
+    printf("Entering main loop\n");
+
+   long turnOffset = 0;
+   int areWeGoingForward = 0;
    while(1) {
+
       char databuf[1024] = "";
       ret = poll(pfd, NUMPOLL, -1);
       if(ret > 0) { //Something happened
@@ -95,15 +106,33 @@ int main() {
             read(fd3, databuf, 100); //TODO FIX CHARS
             tok = strtok(databuf, ",\n");
             printf("Bwebsockin %s\n", tok);
-            if(!strcmp(tok, "TANKFW"))
-               cmdCarFwdFull();
+            if(!strcmp(tok, "TANKFW")) {
+               cmdCarFwdFull(turnOffset);
+               areWeGoingForward = 1;
+            }
             else if(!strcmp(tok, "TANKREV"))
                cmdCarBackFull();
-            else if(!strcmp(tok, "TANKSTOP"))
+            else if(!strcmp(tok, "TANKSTOP")) {
+               areWeGoingForward = 0;
                cmdCarStop();
+            }
+
              //TANKREV, TANKSTOP
+
+            regmatch_t pmatch[2];
+            int ret = regexec(&ttregex, tok, 2, pmatch, 0);
+            if (!ret && areWeGoingForward) { //TankTurn
+               char* pend;
+               turnOffset = strtol(tok+pmatch[1].rm_so, &pend, 10);
+               cmdCarFwdFull(turnOffset);
+            } 
             
          }
+
+          if (pfd[3].revents & POLLIN) {
+             read(fd4, databuf, 100);
+             printf("i2C: %s\n", databuf);
+          }
       }
    }
    //END MAIN PROGRAM
@@ -135,13 +164,21 @@ static void setMotor(int direction, int percent, int direction2, int percent2) {
 
 
 
-static void cmdCarFwdFull(void){
+static void cmdCarFwdFull(int turn){
       sem_wait (&sem_name);
       printf("Car go!\n");
-      //setMotor(M_RIGHT, FORWARD, 80);
-      //setMotor(M_LEFT, FORWARD, 80);
-      setMotor(FORWARD, 80, FORWARD, 80);
-      sem_post(&sem_name);
+
+      int left, right;
+
+      if (turn < 0) {
+         left = turn;
+         right = 0; 
+      } else {
+         right = turn;
+         left = 0;
+      }
+
+      setMotor(FORWARD, 100 + left, FORWARD, 100 - right);
       sem_post(&sem_name);
 }
 
@@ -208,7 +245,7 @@ static void initCarState(CarState* state){
    state->actions[3] = cmdCarRightFwd;
    state->actions[2] = cmdCarLeftFwd;
    state->actions[4] = cmdCarStop;
-    state->actions[state->state]();
+    //state->actions[state->state]();
 }
 
 //where behavior changing is written

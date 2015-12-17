@@ -21,7 +21,7 @@
    #include <pthread.h>
 
    //listening for adc or button interrupts, poll isnt' actually polling
-   #define NUMPOLL 3
+   #define NUMPOLL 4
 
    //Directions
    #define OFF 0
@@ -46,7 +46,7 @@
    } CarState;
 
    //Function handles that are pointed to by the carstate, predefine movement patterns
-   static void cmdCarFwdFull(void);
+   static void cmdCarFwdFull(int turn);
    static void cmdCarStop(void);
    //turn in place
    static void cmdCarLeftFull(void);
