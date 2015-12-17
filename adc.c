@@ -25,7 +25,6 @@ int main() {
    sigAct.sa_handler = (void (*))timeHandler;
    sigaction(SIGUSR1, &sigAct, 0);
 
-
    // printf("signal setup\n");
 
    sigx.sigev_notify          = SIGEV_SIGNAL;

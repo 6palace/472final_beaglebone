@@ -15,6 +15,7 @@ static int callback_robot_cmd(struct libwebsocket_context * this,
 						 enum libwebsocket_callback_reasons reason, void *user,
 						 void *in, size_t len);
 
+
 static struct libwebsocket_protocols protocols[] = {
 	/* first protocol must always be HTTP handler */
 	{
@@ -54,7 +55,7 @@ int main(void) {
 	info.options = opts;
 
 	context = libwebsocket_create_context(&info);
-   
+
 	if (context == NULL) {
 		fprintf(stderr, "libwebsocket init failed\n");
 		return -1;
@@ -64,7 +65,7 @@ int main(void) {
 
 	while (1) {
 		//libwebsocket_service(context, 50);
-		libwebsocket_service(context, 0); //set to 0ms on single threaded app according to https://libwebsockets.org/libwebsockets-api-doc.html
+		libwebsocket_service(context, 50); //set to 0ms on single threaded app according to https://libwebsockets.org/libwebsockets-api-doc.html
 
 		//do more single threaded stuff here
 
@@ -74,7 +75,6 @@ int main(void) {
 	libwebsocket_context_destroy(context);
 	return 0;
 }
-
 
 static int callback_http(struct libwebsocket_context * this,
 						 struct libwebsocket *wsi,
@@ -97,11 +97,10 @@ static int callback_robot_cmd(struct libwebsocket_context * this,
 			//From documentation: data has appeared for the server, it can be found at *in and is len bytes long 
 			printf("Data Recieved: %s\n", (char*)in);
 
-
 			FILE* fwsOut = fopen("/tmp/fromWebsocket", "w");
 			fprintf(fwsOut, "%s\n", in);
+			fflush(fwsOut);
 			fclose(fwsOut);
-
 
 			//send something back
 			libwebsocket_callback_on_writable(this, wsi); //call this to get a LWS_CALLBACK_SERVER_WRITEABLE
