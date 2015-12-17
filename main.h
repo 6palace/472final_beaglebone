@@ -61,4 +61,7 @@
 
    //send motor command down pipe to motor process
    static void setMotor(int direction, int percent, int direction2, int percent2);
+
+   static void lcdPrint(char* str);
+   static void lcdControl(char* str);
 #endif

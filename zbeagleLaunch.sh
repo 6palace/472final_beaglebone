@@ -16,14 +16,25 @@ echo BeagleBone Launch Script For Robot
 # Carry out specific functions when asked to by the system
 case "$1" in
   start)
-    echo "Rev1"
+    echo "Rev1"   
+    sleep 10
     echo "Pinmuxing..."
     echo uart > /sys/devices/platform/ocp/ocp\:P9_24_pinmux/state
     echo uart > /sys/devices/platform/ocp/ocp\:P9_26_pinmux/state
-    sleep 10
+    i2cset -y 2 0x68 0x6b 0x00
+    i2cdump -y 2 0x68
+    stty -F /dev/ttyO1 115200
     echo "WiFi Config"
-    hostapd /etc/hostapd/hostapd.conf
+    hostapd /etc/hostapd/hostapd.conf & 
+    sleep 4
+    echo Setting IP
+    ifconfig wlan0 192.168.0.40 &
     echo WiFi AP Created
+    /root/videostream/reloadff.sh > /dev/null &
+    echo Webcam Server Started
+    sleep 2
+    /root/ws/wsServer &
+    echo Websocket Server Started
     ;;
   stop)
     echo "Stopping script blah"

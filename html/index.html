@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="HandheldFriendly" content="True">
+	<meta name="MobileOptimized" content="320">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	<meta name="theme-color" content="#111">
+	<title>Websockets</title>
+	<script src="jquery-2.1.4.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="style.css">
+	<style>
+	
+</style>
+</head>
+
+<body id="home">
+	<h1>BeagleTank!</h1><br>
+
+	<div class="infoDash">
+	Connected: <span id="connectData">No</span><br>
+	Future Direction: <span id="fdData"></span><br>
+	Temperature: <span id="temperatureData"></span><br>
+	</div>
+
+	<video autoplay id="robovid">
+		<source id="videorobovid" src="http://192.168.0.40:8090/test.webm" type="video/webm">
+	</video>
+
+	<div id="bottompane">
+	<div id="butRev" class="touchbutton left noselect">Reverse</div>
+	<div id="butFw" class="touchbutton right noselect">Forward</div>
+	<div id="butMode" class="touchbutton centerish noselect">Mode</div>
+	</div>
+
+	<script src="robot.js"></script>
+
+</body>
+</html>

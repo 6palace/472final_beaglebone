@@ -61,6 +61,9 @@ int main() {
    regcomp(&ttregex, "^TANKTURN:([-]?[0-9][0-9]?[0-9]?)$", REG_EXTENDED);
 
     printf("Entering main loop\n");
+   lcdControl("11"); //clear any old LCD settings
+   lcdControl("2"); //turn cursor off
+   lcdPrint("Manual Mode\nWelcome 2 Beagle");
 
    long turnOffset = 0;
    int areWeGoingForward = 0;
@@ -161,6 +164,13 @@ int main() {
             }
             else if(!strcmp(tok, "TANKMODE")) {
                cs.autoMode = !cs.autoMode;
+               lcdControl("11"); //clear any old LCD settings
+               lcdControl("2"); //turn cursor off
+               if (cs.autoMode) {
+                  lcdPrint("Autonomous Mode");
+               } else {
+                  lcdPrint("Manual Mode");
+               }
             }
 
           }
@@ -299,3 +309,15 @@ static void refreshCarState(CarState* state){
    state->oldstate = state->state;
 }
 //duty percent 30 minimum
+
+static void lcdPrint(char* str) {
+   FILE* txt = fopen("/dev/lcd_char/text", "w");
+   fprintf(txt, "%s", str);
+   fclose(txt);
+}
+
+static void lcdControl(char* str) {
+   FILE* ctrl = fopen("/dev/lcd_char/ctrl", "w");
+   fprintf(ctrl, "%s", str);
+   fclose(ctrl);  
+}
