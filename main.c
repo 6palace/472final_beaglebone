@@ -17,7 +17,8 @@ int main() {
    mknod("/tmp/adcData", S_IFIFO, 0);
    mknod("/tmp/motorData", S_IFIFO, 0);
    mknod("/tmp/fromWebsocket", S_IFIFO, 0);
-      mknod("/tmp/i2cData", S_IFIFO, 0);
+   mknod("/tmp/i2cData", S_IFIFO, 0);
+
 
    //pthread_sem_name_init(&lock, NULL);
    sem_init(&sem_name, 0, 1);
@@ -31,13 +32,14 @@ int main() {
    struct pollfd pfd[NUMPOLL];
    int ret;
    ssize_t bytes;
-   int fd, fd2, fd3, fd4;
+   int fd, fd2, fd3, fd4, fd5;
    char* tok;
    int motorflag;
    fd = open("/tmp/adcData", O_RDONLY);
    fd2 = open("/dev/ib", O_RDONLY);
    fd3 = open("/tmp/fromWebsocket", O_RDWR);
    fd4 = open("/tmp/i2cData", O_RDWR);
+   fd5 = open("/dev/ttyO1", O_RDWR);
    pfd[0].fd = fd;   
    pfd[0].events = POLLIN;
    pfd[1].fd = fd2;
@@ -46,10 +48,9 @@ int main() {
    pfd[2].events = POLLIN;
    pfd[3].fd = fd4;
    pfd[3].events = POLLIN;
+   pfd[4].fd = fd5;
+   pfd[4].events = POLLIN | POLLHUP | POLLRDNORM ;
 
-
-
-   
 
    int adcVals[4]; //[0] back [1] left [2] front [3] right
 
@@ -117,6 +118,9 @@ int main() {
                areWeGoingForward = 0;
                cmdCarStop();
             }
+            else if(!strcmp(tok, "TANKMODE")) {
+               cs.autoMode = !cs.autoMode;
+            }
 
              //TANKREV, TANKSTOP
 
@@ -138,6 +142,27 @@ int main() {
              fflush(toWebsocket);
 
              fclose(toWebsocket);
+          }
+
+          if(pfd[4].revents & POLLIN) {
+            read(fd5, databuf, 20);
+
+            tok = strtok(databuf, ",\n");
+            printf("BwUART %s\n", tok);
+            if(!strcmp(tok, "TANKFW")) {
+               cmdCarFwdFull(turnOffset);
+               areWeGoingForward = 1;
+            }
+            else if(!strcmp(tok, "TANKREV"))
+               cmdCarBackFull();
+            else if(!strcmp(tok, "TANKSTOP")) {
+               areWeGoingForward = 0;
+               cmdCarStop();
+            }
+            else if(!strcmp(tok, "TANKMODE")) {
+               cs.autoMode = !cs.autoMode;
+            }
+
           }
       }
    }

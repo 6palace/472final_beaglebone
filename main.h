@@ -20,7 +20,7 @@
    #include <string.h>
 
    //listening for adc or button interrupts, poll isnt' actually polling
-   #define NUMPOLL 4
+   #define NUMPOLL 5
 
    //Directions
    #define OFF 0
