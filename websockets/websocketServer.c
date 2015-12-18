@@ -84,7 +84,6 @@ int main(void) {
 		//libwebsocket_service(context, 50);
 		char databuf[1024] = "";
 		libwebsocket_service(context, 50); //set to 0ms on single threaded app according to https://libwebsockets.org/libwebsockets-api-doc.html
-		printf("anded: %d\n", mask & O_NONBLOCK == O_NONBLOCK);
 		//do more single threaded stuff here
 		ssize_t r = read(fd, databuf, 100);
 		if (r == -1 && errno == EAGAIN){
@@ -93,11 +92,9 @@ int main(void) {
 		} else if (r > 0){
 		    // received data
 		    // take databuf and process it
-		    printf("recieved temp info\n");
 		    strncpy(storedTemp, databuf, strlen(databuf));
 		} else{
 			//closed pipe
-			printf("closed pipe\n");
 		}
 
 
@@ -120,6 +117,7 @@ static int callback_robot_cmd(struct libwebsocket_context * this,
 						 enum libwebsocket_callback_reasons reason, void *user,
 						 void *in, size_t len)
 {
+	int storedTempLen;
 	switch (reason) {
 		case LWS_CALLBACK_ESTABLISHED:
 			printf("Client Connected\n");
@@ -140,8 +138,8 @@ static int callback_robot_cmd(struct libwebsocket_context * this,
 
 			break;
 		case LWS_CALLBACK_SERVER_WRITEABLE:
-			printf("Sending Data\n");
-			int storedTempLen = strlen(storedTemp)+1;
+
+			storedTempLen = strlen(storedTemp)+1;
 
 			int bufSize = LWS_SEND_BUFFER_PRE_PADDING + storedTempLen + LWS_SEND_BUFFER_POST_PADDING;
 			char* buf = (char*) malloc(bufSize);
