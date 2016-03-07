@@ -1,3 +1,4 @@
+(outdated)
 This Lab comprises several units working together to create a car that can travel and react to it's environment, using both LKMs and user-space processes scommunicating with each other. There are 4 main parts:
 
    1. Button interrupt driver: Instead of polling button GPIOs, our new button LKM sends an interrupt whenever a button is pressed, displays the current button status when it's character device file is read.
